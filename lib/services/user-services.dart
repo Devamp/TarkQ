@@ -1,0 +1,165 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tark_q/services/data-access.dart';
+
+class UserServices {
+  // Private constructor
+  UserServices._privateConstructor();
+
+  DocumentSnapshot? userData;
+  int ticketIdx = 0;
+
+  // The single instance
+  static final UserServices _instance = UserServices._privateConstructor();
+
+  static UserServices get instance => _instance;
+
+  // Get current user
+  User? get currentUser => _auth.currentUser;
+
+  // Stream to listen to auth changes (e.g. user login/logout)
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  static final DataAccess dataAccess = DataAccess.instance;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<bool?> verifyUserVerification() async {
+    try {
+      await _auth.currentUser?.reload();
+      return _auth.currentUser?.emailVerified;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> sendEmailVerificationLink() async {
+    try {
+      await _auth.currentUser?.sendEmailVerification();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteUserAccount() async {
+    try {
+      _auth.currentUser?.delete();
+      await dataAccess.delete(_auth.currentUser!.email!);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> sendPasswordResetEmail(String userEmail) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: userEmail);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRaidTickets(String userEmail) async {
+    try {
+      return await dataAccess.fetchRaidTickets(userEmail, ticketIdx, 5);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchUserRaidTickets(
+    String userEmail,
+  ) async {
+    try {
+      return await dataAccess.fetchUserRaidTickets(userEmail);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> deleteUserTicket(
+    String userEmail,
+    int ticketId,
+  ) async {
+    try {
+      return await dataAccess.deleteUserTicket(userEmail, ticketId);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Sign up with email & password
+  Future<UserCredential> signUpUser(
+    String username,
+    String email,
+    String password,
+  ) async {
+    try {
+      // create user with email and password
+      final result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // add user to firestore
+      await dataAccess.createUser(email, username);
+
+      return result;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Login with email & password
+  Future<UserCredential> signInUser(String email, String password) async {
+    try {
+      return await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Logout
+  Future<void> signOutUser() async {
+    await _auth.signOut();
+  }
+
+  Future<void> loadUserOnLogin() async {
+    try {
+      userData = await dataAccess.getUserData(_auth.currentUser!.email);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> setTicketIdx(int idx) async {
+    ticketIdx = idx;
+    await dataAccess.fetchRaidTickets(getUserEmail(), ticketIdx, 5);
+  }
+
+  String getUsername() {
+    userData?.data() as Map<String, dynamic>?;
+
+    final String? username = userData?['username'] as String?;
+
+    if (username != null) {
+      return username;
+    }
+
+    throw Exception('Failed to get username');
+  }
+
+  String getUserEmail() {
+    userData?.data() as Map<String, dynamic>?;
+
+    final String? email = userData?['email'] as String?;
+
+    if (email != null) {
+      return email;
+    }
+
+    throw Exception('Failed to get email');
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "473679297572",
+    "project_id": "tarkq-3fe1b",
+    "storage_bucket": "tarkq-3fe1b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473679297572:android:417ce89884af5dcbafecb1",
+        "android_client_info": {
+          "package_name": "com.example.tark_q"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDyMXsd_aMC5zUiOQqUvEhULvSglJ3X7Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
