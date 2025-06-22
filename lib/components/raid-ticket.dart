@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tark_q/views/ticket-view.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../globals.dart';
 
 class RaidTicket extends StatefulWidget {
@@ -14,7 +14,7 @@ class RaidTicket extends StatefulWidget {
 
 class _RaidTicketState extends State<RaidTicket> {
   Widget buildInfoContent(
-    IconData icon,
+    Widget icon,
     String iconText,
     BuildContext context, [
     Color? iconColor,
@@ -23,7 +23,7 @@ class _RaidTicketState extends State<RaidTicket> {
       padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white, size: isTablet(context) ? 28 : 20),
+          icon,
           SizedBox(width: 5),
           Text(
             iconText,
@@ -44,7 +44,7 @@ class _RaidTicketState extends State<RaidTicket> {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isTablet(context) ? 10 : 5,
-        horizontal: isTablet(context) ? 10 : 5,
+        horizontal: isTablet(context) ? 15 : 10,
       ),
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -83,7 +83,11 @@ class _RaidTicketState extends State<RaidTicket> {
                   ),
                   Spacer(),
                   buildInfoContent(
-                    Icons.leaderboard,
+                    Icon(
+                      Icons.leaderboard,
+                      color: Colors.white,
+                      size: isTablet(context) ? 28 : 20,
+                    ),
                     "Lv" + widget.data['pmcLevel'],
                     context,
                   ),
@@ -102,17 +106,29 @@ class _RaidTicketState extends State<RaidTicket> {
                         Row(
                           children: [
                             buildInfoContent(
-                              Icons.shield_outlined,
+                              Icon(
+                                Icons.shield_outlined,
+                                color: Colors.white,
+                                size: isTablet(context) ? 28 : 20,
+                              ),
                               widget.data['pmcFaction'],
                               context,
                             ),
                             buildInfoContent(
-                              Icons.location_on,
+                              Icon(
+                                Icons.location_on,
+                                color: Colors.white,
+                                size: isTablet(context) ? 28 : 20,
+                              ),
                               widget.data['map'],
                               context,
                             ),
                             buildInfoContent(
-                              Icons.diversity_3_rounded,
+                              Icon(
+                                Icons.diversity_3_rounded,
+                                color: Colors.white,
+                                size: isTablet(context) ? 28 : 20,
+                              ),
                               widget.data['maxPartySize'],
                               context,
                             ),
@@ -121,12 +137,26 @@ class _RaidTicketState extends State<RaidTicket> {
                         Row(
                           children: [
                             buildInfoContent(
-                              Icons.flag,
+                              Icon(
+                                Icons.flag,
+                                color: Colors.white,
+                                size: isTablet(context) ? 28 : 20,
+                              ),
                               widget.data['goal'],
                               context,
                             ),
                             buildInfoContent(
-                              Icons.contacts,
+                              widget.data['contactMethod'] == "Discord"
+                                  ? Icon(
+                                    Icons.discord,
+                                    color: Colors.white,
+                                    size: isTablet(context) ? 28 : 20,
+                                  )
+                                  : Icon(
+                                    Icons.contacts,
+                                    color: Colors.white,
+                                    size: isTablet(context) ? 28 : 20,
+                                  ),
                               widget.data['contactMethod'],
                               context,
                             ),
@@ -142,9 +172,31 @@ class _RaidTicketState extends State<RaidTicket> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder:
-                            (context) => TicketView(ticketData: widget.data),
+                      PageRouteBuilder(
+                        pageBuilder:
+                            (context, animation, secondaryAnimation) =>
+                                TicketView(ticketData: widget.data),
+                        transitionsBuilder: (
+                          context,
+                          animation,
+                          secondaryAnimation,
+                          child,
+                        ) {
+                          const begin = Offset(1.0, 0.0); // From right
+                          const end = Offset.zero;
+                          const curve = Curves.ease;
+
+                          final tween = Tween(
+                            begin: begin,
+                            end: end,
+                          ).chain(CurveTween(curve: curve));
+
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                        transitionDuration: const Duration(milliseconds: 300),
                       ),
                     );
                   },

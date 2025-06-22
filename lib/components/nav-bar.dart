@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tark_q/views/login-page.dart';
 import 'package:tark_q/views/navbar-views/home-page.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
 import 'package:tark_q/views/raid-form.dart';
@@ -53,6 +54,66 @@ class _NavBarState extends State<NavBar> {
                   ).push(MaterialPageRoute(builder: (context) => RaidForm()));
                 },
               ),
+            if (_selectedIndex == 1)
+              IconButton(
+                color: Colors.redAccent,
+                icon: Icon(Icons.logout, size: isTablet(context) ? 36 : 26),
+                onPressed:
+                    () => {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.grey.shade200,
+                            title: Text('Are you sure?'),
+                            titleTextStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontSize: isTablet(context) ? 26 : 22,
+                            ),
+                            content: Text(
+                              'You will be logged out.',
+                              style: TextStyle(
+                                fontSize: isTablet(context) ? 20 : 14,
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text(
+                                  'Yes',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: isTablet(context) ? 22 : 16,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  userServices.signOutUser();
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => Login(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              TextButton(
+                                child: Text(
+                                  'No',
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontSize: isTablet(context) ? 22 : 16,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    },
+              ),
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1.0),
@@ -75,12 +136,12 @@ class _NavBarState extends State<NavBar> {
           selectedItemColor: Colors.lightGreenAccent,
           selectedLabelStyle: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: isTablet(context) ? 28 : 18,
+            fontSize: isTablet(context) ? 28 : 15,
           ),
           unselectedItemColor: Colors.grey,
           unselectedLabelStyle: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: isTablet(context) ? 28 : 18,
+            fontSize: isTablet(context) ? 28 : 15,
           ),
           backgroundColor: Colors.transparent,
           items: <BottomNavigationBarItem>[

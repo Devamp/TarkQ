@@ -196,4 +196,38 @@ class DataAccess {
       rethrow;
     }
   }
+
+  Future<void> updateUserAchievements(
+    String userEmail,
+    List<String?> achievements,
+  ) async {
+    try {
+      await FirebaseFirestore.instance.collection('User').doc(userEmail).update(
+        {'achievements': achievements},
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<String>> getUserAchievements(String userEmail) async {
+    try {
+      final docSnapshot =
+          await FirebaseFirestore.instance
+              .collection('User')
+              .doc(userEmail)
+              .get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        if (data != null && data['achievements'] != null) {
+          return List<String>.from(data['achievements']);
+        }
+      }
+
+      return [];
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -226,8 +226,8 @@ class _SignupState extends State<Signup> {
                         backgroundColor: Colors.lightGreenAccent,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 50,
-                          vertical: 15,
+                          horizontal: 35,
+                          vertical: 8,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
@@ -240,7 +240,7 @@ class _SignupState extends State<Signup> {
                                   children: [
                                     LoadingAnimationWidget.inkDrop(
                                       color: Colors.black,
-                                      size: 30,
+                                      size: 28,
                                     ),
                                   ],
                                 ),

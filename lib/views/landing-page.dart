@@ -102,8 +102,8 @@ class Landing extends StatelessWidget {
                   backgroundColor: Colors.lightGreenAccent,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 50,
-                    vertical: 15,
+                    horizontal: 35,
+                    vertical: 8,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),
@@ -116,7 +116,7 @@ class Landing extends StatelessWidget {
                         'DEPLOY',
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: isTablet(context) ? 40 : 28,
+                          fontSize: isTablet(context) ? 40 : 22,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.none,
                         ),

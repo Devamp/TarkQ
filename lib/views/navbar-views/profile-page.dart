@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
-import 'package:tark_q/views/login-page.dart';
+import 'package:tark_q/views/achievements-page.dart';
+import '../../components/award-container.dart';
 import '../../components/raid-ticket.dart';
 import '../../globals.dart';
 import '../../services/user-services.dart';
@@ -14,160 +15,143 @@ class Profile extends StatefulWidget {
   State<Profile> createState() => _ProfileState();
 }
 
-Widget buildProfileHeader(BuildContext context) {
-  String username = userServices.getUsername();
-
-  return Padding(
-    padding: EdgeInsets.all(isTablet(context) ? 10 : 5),
-    child: Container(
-      color: Colors.black,
-      child: Column(
-        children: [
-          ProfilePicture(
-            name: userServices.getUsername().toString().toUpperCase(),
-            radius: isTablet(context) ? 70 : 60,
-            fontsize: isTablet(context) ? 44 : 40,
-          ),
-          SizedBox(height: 10),
-          Text(
-            username,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet(context) ? 32 : 24,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed:
-                () => {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        backgroundColor: Colors.grey.shade200,
-                        title: Text('Are you sure?'),
-                        titleTextStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontSize: isTablet(context) ? 26 : 22,
-                        ),
-                        content: Text(
-                          'You will be logged out.',
-                          style: TextStyle(
-                            fontSize: isTablet(context) ? 20 : 14,
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            child: Text(
-                              'Yes',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: isTablet(context) ? 22 : 16,
-                              ),
-                            ),
-                            onPressed: () {
-                              userServices.signOutUser();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => Login(),
-                                ),
-                              );
-                            },
-                          ),
-                          TextButton(
-                            child: Text(
-                              'No',
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: isTablet(context) ? 22 : 16,
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.black,
-              padding: EdgeInsets.symmetric(
-                horizontal: isTablet(context) ? 60 : 40,
-                vertical: isTablet(context) ? 10 : 5,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-            ),
-            child: IntrinsicWidth(
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.logout,
-                    color: Colors.black,
-                    size: isTablet(context) ? 26 : 22,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    'Logout',
-                    style: TextStyle(
-                      fontSize: isTablet(context) ? 24 : 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withAlpha(75),
-                  width: 1.0,
-                ),
-              ),
-            ),
-            width: double.infinity,
-            child: Padding(
-              padding: EdgeInsets.all(isTablet(context) ? 20 : 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'My Tickets',
-                    style: TextStyle(
-                      color: Colors.lightGreenAccent,
-                      fontSize: isTablet(context) ? 28 : 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'These are your active tickets.',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: isTablet(context) ? 20 : 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
 class _ProfileState extends State<Profile> {
+  Future<List<String?>> getUserAchievements() async {
+    try {
+      return userServices.getUserAchievements(userServices.getUserEmail());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Widget buildProfileHeader(BuildContext context) {
+    String username = userServices.getUsername();
+
+    return FutureBuilder<List<String?>>(
+      future: getUserAchievements(),
+      builder: (context, snapshot) {
+        final userAchievements = snapshot.data ?? [];
+
+        return Padding(
+          padding: EdgeInsets.all(isTablet(context) ? 15 : 10),
+          child: Container(
+            color: Colors.black,
+            child: Column(
+              children: [
+                ProfilePicture(
+                  name: username.toUpperCase(),
+                  radius: isTablet(context) ? 70 : 60,
+                  fontsize: isTablet(context) ? 44 : 40,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  username,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isTablet(context) ? 32 : 24,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.white.withAlpha(75),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Achievements',
+                        style: TextStyle(
+                          color: Colors.lightGreenAccent,
+                          fontSize: isTablet(context) ? 28 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.grey,
+                          size: isTablet(context) ? 36 : 20,
+                        ),
+                        onPressed: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => AchievementsPage(),
+                            ),
+                          );
+                          setState(() {});
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                userAchievements.whereType<String>().isEmpty
+                    ? Text(
+                      'No achievements selected',
+                      style: TextStyle(color: Colors.grey),
+                    )
+                    : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:
+                          userAchievements
+                              .where((achievement) => achievement != "None")
+                              .map((achievement) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 8.0,
+                                    right: 8.0,
+                                  ),
+                                  child: AwardContainer(
+                                    icon: getAchievementIconByText(
+                                      achievement!,
+                                    ),
+                                    iconText: achievement,
+                                    screenName: "Profile",
+                                  ),
+                                );
+                              })
+                              .toList(),
+                    ),
+                SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.white.withAlpha(75),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  width: double.infinity,
+                  child: Padding(
+                    padding: EdgeInsets.all(isTablet(context) ? 20 : 5),
+                    child: Text(
+                      'Active Tickets',
+                      style: TextStyle(
+                        color: Colors.lightGreenAccent,
+                        fontSize: isTablet(context) ? 28 : 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<List<Map<String, dynamic>>> _loadRaidTickets() async {
     await userServices.loadUserOnLogin();
 

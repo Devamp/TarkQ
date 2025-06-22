@@ -162,4 +162,23 @@ class UserServices {
 
     throw Exception('Failed to get email');
   }
+
+  Future<void> updateUserAchievements(
+    String userEmail,
+    List<String?> achievements,
+  ) async {
+    return await dataAccess.updateUserAchievements(userEmail, achievements);
+  }
+
+  Future<List<String?>> getUserAchievements(String email) async {
+    final doc =
+        await FirebaseFirestore.instance.collection('User').doc(email).get();
+
+    final data = doc.data();
+    if (data != null && data['achievements'] is List) {
+      return List<String>.from(data['achievements']);
+    }
+
+    return [];
+  }
 }

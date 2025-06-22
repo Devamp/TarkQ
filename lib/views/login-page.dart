@@ -200,8 +200,8 @@ class _LoginState extends State<Login> {
                         backgroundColor: Colors.lightGreenAccent,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 50,
-                          vertical: 15,
+                          horizontal: 35,
+                          vertical: 8,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
@@ -214,7 +214,7 @@ class _LoginState extends State<Login> {
                                   children: [
                                     LoadingAnimationWidget.inkDrop(
                                       color: Colors.black,
-                                      size: 30,
+                                      size: 28,
                                     ),
                                   ],
                                 ),
@@ -225,7 +225,7 @@ class _LoginState extends State<Login> {
                                     Icon(
                                       Icons.person,
                                       color: Colors.black,
-                                      size: isTablet(context) ? 32 : 25,
+                                      size: isTablet(context) ? 32 : 23,
                                     ),
                                     SizedBox(width: 5),
                                     Text(

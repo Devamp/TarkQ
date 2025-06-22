@@ -483,6 +483,7 @@ class _RaidFormState extends State<RaidForm> {
                             'contactMethod': contactMethodValue,
                             'contactId': _contactIdController.text,
                             'createdAt': Timestamp.now(),
+                            'userEmail': userServices.getUserEmail(),
                           };
 
                           await dataAccess.createRaidTicket(
@@ -490,13 +491,17 @@ class _RaidFormState extends State<RaidForm> {
                             userServices.getUserEmail(),
                           );
 
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => NavBar()),
-                          );
+                          if (mounted) {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (context) => NavBar()),
+                            );
+                          }
                         } else {
-                          setState(() {
-                            isLoading = !isLoading;
-                          });
+                          if (mounted) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
                           // Show alert if tickets >= 10
                           showDialog(
                             context: context,
@@ -571,13 +576,13 @@ class _RaidFormState extends State<RaidForm> {
                                   Icon(
                                     Icons.check,
                                     color: Colors.black,
-                                    size: isTablet(context) ? 28 : 25,
+                                    size: isTablet(context) ? 28 : 22,
                                   ),
                                   SizedBox(width: 10),
                                   Text(
                                     'Submit Ticket',
                                     style: TextStyle(
-                                      fontSize: isTablet(context) ? 24 : 20,
+                                      fontSize: isTablet(context) ? 24 : 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

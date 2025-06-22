@@ -128,7 +128,7 @@ class _VerifyEmailState extends State<VerifyEmail>
                       ),
                       SizedBox(width: 5),
                       const Text(
-                        'Check Status',
+                        'Verify',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -137,6 +137,12 @@ class _VerifyEmailState extends State<VerifyEmail>
                     ],
                   ),
                 ),
+              ),
+              SizedBox(height: 8),
+              const Text(
+                textAlign: TextAlign.center,
+                'Make sure to check the SPAM folder!',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
               SizedBox(height: 8),
               !verificationStatus && !initialLoad

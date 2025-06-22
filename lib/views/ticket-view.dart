@@ -5,11 +5,20 @@ import 'package:intl/intl.dart';
 import 'package:tark_q/components/nav-bar.dart';
 import 'package:tark_q/globals.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
+import '../components/award-container.dart';
 
 class TicketView extends StatelessWidget {
   final Map<String, dynamic> ticketData;
 
   const TicketView({super.key, required this.ticketData});
+
+  Future<List<String?>> getUserAchievements() async {
+    try {
+      return userServices.getUserAchievements(ticketData['userEmail']);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Widget formField(
     IconData icon,
@@ -66,7 +75,6 @@ class TicketView extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            SizedBox(height: 10),
           ],
         ),
       ),
@@ -74,133 +82,166 @@ class TicketView extends StatelessWidget {
   }
 
   Widget buildTicketDetails(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              'General',
-              style: TextStyle(
-                color: Colors.lightGreenAccent,
-                fontSize: isTablet(context) ? 40 : 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            formField(
-              Icons.contrast,
-              'Faction',
-              ticketData['pmcFaction'],
-              context,
-            ),
-            formField(
-              Icons.equalizer,
-              'Level',
-              ticketData['pmcLevel'],
-              context,
-            ),
-            formField(
-              Icons.date_range,
-              'Created At',
-              getFormattedDate(ticketData['createdAt']),
-              context,
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Raid Info',
-              style: TextStyle(
-                color: Colors.lightGreenAccent,
-                fontSize: isTablet(context) ? 40 : 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            formField(
-              Icons.location_on_outlined,
-              'Map',
-              ticketData['map'],
-              context,
-            ),
-            formField(Icons.flag, 'Goal', ticketData['goal'], context),
-            formField(
-              Icons.diversity_3_rounded,
-              'Party Size',
-              ticketData['maxPartySize'],
-              context,
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Contact Info',
-              style: TextStyle(
-                color: Colors.lightGreenAccent,
-                fontSize: isTablet(context) ? 40 : 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            formField(
-              Icons.contacts,
-              'Contact Method',
-              ticketData['contactMethod'],
-              context,
-            ),
-            formField(
-              Icons.person_add,
-              'Username',
-              ticketData['contactId'],
-              context,
-            ),
-            SizedBox(height: 30),
-            userServices.userData?['username'] == ticketData['username']
-                ? Center(
-                  child: ElevatedButton(
-                    onPressed:
-                        () async => {
+    return FutureBuilder<List<String?>>(
+      future: getUserAchievements(),
+      builder: (context, snapshot) {
+        final userAchievements = snapshot.data ?? [];
+
+        return Container(
+          color: Colors.black,
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                userAchievements.whereType<String>().isEmpty
+                    ? SizedBox()
+                    : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:
+                          userAchievements
+                              .whereType<String>()
+                              .take(4)
+                              .where((achievement) => achievement != "None")
+                              .map((achievement) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 8.0,
+                                    right: 8.0,
+                                  ),
+                                  child: AwardContainer(
+                                    icon: getAchievementIconByText(achievement),
+                                    iconText: achievement,
+                                    screenName: "Profile",
+                                  ),
+                                );
+                              })
+                              .toList(),
+                    ),
+                SizedBox(height: 10),
+                Text(
+                  'General',
+                  style: TextStyle(
+                    color: Colors.lightGreenAccent,
+                    fontSize: isTablet(context) ? 40 : 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                formField(
+                  Icons.contrast,
+                  'Faction',
+                  ticketData['pmcFaction'],
+                  context,
+                ),
+                formField(
+                  Icons.equalizer,
+                  'Level',
+                  ticketData['pmcLevel'],
+                  context,
+                ),
+                formField(
+                  Icons.date_range,
+                  'Created At',
+                  getFormattedDate(ticketData['createdAt']),
+                  context,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Raid Info',
+                  style: TextStyle(
+                    color: Colors.lightGreenAccent,
+                    fontSize: isTablet(context) ? 40 : 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                formField(
+                  Icons.location_on_outlined,
+                  'Map',
+                  ticketData['map'],
+                  context,
+                ),
+                formField(Icons.flag, 'Goal', ticketData['goal'], context),
+                formField(
+                  Icons.diversity_3_rounded,
+                  'Party Size',
+                  ticketData['maxPartySize'],
+                  context,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Contact Info',
+                  style: TextStyle(
+                    color: Colors.lightGreenAccent,
+                    fontSize: isTablet(context) ? 40 : 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                formField(
+                  ticketData['contactMethod'] == "Discord"
+                      ? Icons.discord
+                      : Icons.contacts,
+                  'Contact Method',
+                  ticketData['contactMethod'],
+                  context,
+                ),
+                formField(
+                  Icons.person_add,
+                  'Username',
+                  ticketData['contactId'],
+                  context,
+                ),
+                SizedBox(height: 30),
+                userServices.userData?['username'] == ticketData['username']
+                    ? Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
                           await userServices.deleteUserTicket(
                             userServices.getUserEmail(),
                             ticketData['ticketId'],
-                          ),
+                          );
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => NavBar()),
-                          ),
+                          );
                         },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.black,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isTablet(context) ? 60 : 30,
-                        vertical: isTablet(context) ? 20 : 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: IntrinsicWidth(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.delete_forever,
-                            color: Colors.black,
-                            size: isTablet(context) ? 30 : 25,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.black,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isTablet(context) ? 60 : 30,
+                            vertical: isTablet(context) ? 20 : 10,
                           ),
-                          SizedBox(width: 5),
-                          Text(
-                            'Delete Ticket',
-                            style: TextStyle(
-                              fontSize: isTablet(context) ? 30 : 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                        ],
+                        ),
+                        child: IntrinsicWidth(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_forever,
+                                color: Colors.black,
+                                size: isTablet(context) ? 30 : 25,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                'Delete Ticket',
+                                style: TextStyle(
+                                  fontSize: isTablet(context) ? 30 : 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                )
-                : SizedBox(),
-          ],
-        ),
-      ),
+                    )
+                    : SizedBox(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
