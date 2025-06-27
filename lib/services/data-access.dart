@@ -10,16 +10,12 @@ class DataAccess {
   Future<void> createUser(String email, String username) async {
     try {
       // add new user to collection
-      await FirebaseFirestore.instance.collection('User').doc(email).set({
+      await FirebaseFirestore.instance.collection('Users').doc(email).set({
         'username': username,
         'email': email,
+        'numRaidTickets': 0,
         'dateJoined': FieldValue.serverTimestamp(),
       });
-
-      // set up user's raid ticket collection
-      await FirebaseFirestore.instance.collection('RaidTickets').doc(email).set(
-        {'tickets': []},
-      );
     } catch (e) {
       rethrow;
     }
@@ -32,7 +28,7 @@ class DataAccess {
           .doc(userEmail)
           .delete();
       await FirebaseFirestore.instance
-          .collection('User')
+          .collection('Users')
           .doc(userEmail)
           .delete();
     } catch (e) {
@@ -40,57 +36,87 @@ class DataAccess {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchUserRaidTickets(
+  Future<List<Map<String, dynamic>>> getUserRaidTickets(
     String userEmail,
   ) async {
     try {
       QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('RaidTickets').get();
+          await FirebaseFirestore.instance
+              .collection('RaidTickets')
+              .where('userEmail', isEqualTo: userEmail)
+              .orderBy('timestamp', descending: true)
+              .get();
 
-      // Filter out the document with ID == userEmail
-      final otherDocs =
-          snapshot.docs.where((doc) => doc.id == userEmail).toList();
-
-      List<Map<String, dynamic>> returnList = [];
-
-      for (var item in otherDocs) {
-        returnList.add(item.data() as Map<String, dynamic>);
-      }
-
-      return returnList;
+      return snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchRaidTickets(
-    String userEmail,
-    int startIdx,
-    int limit,
-  ) async {
+  Future<List<Map<String, dynamic>>> getDisplayRaidTickets(
+    String userEmail, [
+    Map<String, String>? filters,
+  ]) async {
     try {
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('RaidTickets').get();
+      // Fetch tickets NOT by the user, ordered by timestamp desc
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('RaidTickets')
+              .where('userEmail', isNotEqualTo: userEmail)
+              .orderBy(
+                'userEmail',
+              ) // Required by Firestore with where 'isNotEqualTo'
+              .orderBy('timestamp', descending: true)
+              .get();
 
-      // Filter out the document with ID == userEmail
-      final otherDocs =
-          snapshot.docs.where((doc) => doc.id != userEmail).toList();
+      List<Map<String, dynamic>> allTickets =
+          snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
+          }).toList();
 
-      List<Map<String, dynamic>> returnList = [];
-
-      if (otherDocs.length > startIdx) {
-        final paginatedDocs = otherDocs.skip(startIdx).take(limit).toList();
-
-        for (var item in paginatedDocs) {
-          returnList.add(item.data() as Map<String, dynamic>);
-        }
-      } else {
-        for (var item in otherDocs) {
-          returnList.add(item.data() as Map<String, dynamic>);
-        }
+      // If no filters, return all tickets
+      if (filters == null || filters.isEmpty) {
+        return allTickets;
       }
 
-      return returnList;
+      // Apply filters locally
+      return allTickets.where((ticket) {
+        // Example: filter by map
+        if (filters.containsKey('map') && filters['map'] != 'Any') {
+          if (ticket['map'] != filters['map']) return false;
+        }
+
+        // Filter by goal
+        if (filters.containsKey('goal') && filters['goal'] != 'Any') {
+          if (ticket['goal'] != filters['goal']) return false;
+        }
+
+        // Filter by party size (as string)
+        if (filters.containsKey('partySize') && filters['partySize'] != 'Any') {
+          if (ticket['partySize']?.toString() != filters['partySize'])
+            return false;
+        }
+
+        // Filter by contact method
+        if (filters.containsKey('contactMethod') &&
+            filters['contactMethod'] != 'Any') {
+          if (ticket['contactMethod'] != filters['contactMethod']) return false;
+        }
+
+        // Filter by PMC level (minimum level)
+        if (filters.containsKey('pmcLevel') && filters['pmcLevel'] != 'Any') {
+          int ticketLevel =
+              int.tryParse(ticket['pmcLevel']?.toString() ?? '0') ?? 0;
+          int minLevel = int.tryParse(filters['pmcLevel']!) ?? 0;
+          if (ticketLevel < minLevel) return false;
+        }
+
+        return true;
+      }).toList();
     } catch (e) {
       rethrow;
     }
@@ -101,12 +127,20 @@ class DataAccess {
     String userEmail,
   ) async {
     try {
+      final docRef = FirebaseFirestore.instance.collection('RaidTickets').doc();
+      final docId = docRef.id;
+
+      await docRef.set({
+        ...ticketData,
+        'userEmail': userEmail,
+        'timestamp': FieldValue.serverTimestamp(),
+        'id': docId,
+      });
+
       await FirebaseFirestore.instance
-          .collection('RaidTickets')
+          .collection('Users')
           .doc(userEmail)
-          .update({
-            'tickets': FieldValue.arrayUnion([ticketData]),
-          });
+          .update({'numRaidTickets': FieldValue.increment(1)});
     } catch (e) {
       rethrow;
     }
@@ -116,7 +150,7 @@ class DataAccess {
     try {
       DocumentSnapshot doc =
           await FirebaseFirestore.instance
-              .collection('User')
+              .collection('Users')
               .doc(userEmail)
               .get();
 
@@ -130,69 +164,34 @@ class DataAccess {
     }
   }
 
-  Future<List<Map<String, dynamic>>> deleteUserTicket(
-    String userEmail,
-    int ticketId,
-  ) async {
+  Future<void> deleteUserTicket(String userEmail, String ticketDocId) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final DocumentReference raidTicketRef = firestore
+    final DocumentReference ticketRef = firestore
         .collection('RaidTickets')
-        .doc(userEmail);
+        .doc(ticketDocId);
 
     try {
-      // Get current ticket array
-      final snapshot = await raidTicketRef.get();
-      final data = snapshot.data() as Map<String, dynamic>;
-      final List<dynamic> tickets = data['tickets'] ?? [];
+      final snapshot = await ticketRef.get();
 
-      if (ticketId < 0 || ticketId >= tickets.length) {
-        throw Exception('Invalid ticket index.');
+      if (!snapshot.exists) {
+        throw Exception('Ticket not found.');
       }
 
-      // Remove the ticket at index
-      tickets.removeAt(ticketId);
+      final data = snapshot.data() as Map<String, dynamic>;
 
-      // Update the document
-      await raidTicketRef.update({'tickets': tickets});
+      // Verify ownership
+      if (data['userEmail'] != userEmail) {
+        throw Exception('You do not have permission to delete this ticket.');
+      }
 
-      // Return updated list casted properly
-      return List<Map<String, dynamic>>.from(tickets);
+      // Delete the ticket document
+      await ticketRef.delete();
+
+      await firestore.collection('Users').doc(userEmail).update({
+        'numRaidTickets': FieldValue.increment(-1),
+      });
     } catch (e) {
       print('Error deleting ticket: $e');
-      rethrow;
-    }
-  }
-
-  Future<void> deleteOldRaidTickets(String userEmail) async {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final DocumentReference raidTicketRef = firestore
-        .collection('RaidTickets')
-        .doc(userEmail);
-
-    try {
-      final snapshot = await raidTicketRef.get();
-      final data = snapshot.data() as Map<String, dynamic>;
-      final List<dynamic> tickets = data['tickets'] ?? [];
-
-      final now = DateTime.now();
-      final List<Map<String, dynamic>> filteredTickets = [];
-
-      for (var ticket in tickets) {
-        final createdAt = ticket['createdAt'];
-        if (createdAt is Timestamp) {
-          final ticketTime = createdAt.toDate();
-          final difference = now.difference(ticketTime);
-          if (difference.inHours <= 24) {
-            filteredTickets.add(Map<String, dynamic>.from(ticket));
-          }
-        } else {
-          filteredTickets.add(Map<String, dynamic>.from(ticket));
-        }
-      }
-
-      await raidTicketRef.update({'tickets': filteredTickets});
-    } catch (e) {
-      print('Error deleting old tickets: $e');
       rethrow;
     }
   }
@@ -202,9 +201,10 @@ class DataAccess {
     List<String?> achievements,
   ) async {
     try {
-      await FirebaseFirestore.instance.collection('User').doc(userEmail).update(
-        {'achievements': achievements},
-      );
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userEmail)
+          .update({'achievements': achievements});
     } catch (e) {
       rethrow;
     }
@@ -214,7 +214,7 @@ class DataAccess {
     try {
       final docSnapshot =
           await FirebaseFirestore.instance
-              .collection('User')
+              .collection('Users')
               .doc(userEmail)
               .get();
 

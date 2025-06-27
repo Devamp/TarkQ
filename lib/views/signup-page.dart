@@ -194,7 +194,7 @@ class _SignupState extends State<Signup> {
                                 .instance
                                 .signUpUser(
                                   _usernameController.text,
-                                  _emailController.text,
+                                  _emailController.text.toLowerCase(),
                                   _passwordController.text,
                                 );
 

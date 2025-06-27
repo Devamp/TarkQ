@@ -44,7 +44,10 @@ class TicketView extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: isTablet(context) ? 30 : 17,
-            color: Colors.white,
+            color:
+                keyText == "Contact Username"
+                    ? Colors.lightGreenAccent
+                    : Colors.white,
           ),
         ),
       ],
@@ -142,7 +145,7 @@ class TicketView extends StatelessWidget {
                 ),
                 formField(
                   Icons.date_range,
-                  'Created At',
+                  'Created',
                   getFormattedDate(ticketData['createdAt']),
                   context,
                 ),
@@ -187,7 +190,7 @@ class TicketView extends StatelessWidget {
                 ),
                 formField(
                   Icons.person_add,
-                  'Username',
+                  'Contact Username',
                   ticketData['contactId'],
                   context,
                 ),
@@ -196,12 +199,17 @@ class TicketView extends StatelessWidget {
                     ? Center(
                       child: ElevatedButton(
                         onPressed: () async {
+                          final navigator = Navigator.of(context);
+
                           await userServices.deleteUserTicket(
                             userServices.getUserEmail(),
-                            ticketData['ticketId'],
+                            ticketData['id'],
                           );
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => NavBar()),
+
+                          navigator.pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => NavBar(initialIndex: 1),
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -268,13 +276,5 @@ class TicketView extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String getFormattedDate(Timestamp? timestamp) {
-    if (timestamp == null) return 'Unknown';
-
-    final localDateTime = timestamp.toDate().toLocal();
-    final formatter = DateFormat('MMM d, y \'at\' h:mm a');
-    return formatter.format(localDateTime);
   }
 }

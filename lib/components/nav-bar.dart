@@ -1,9 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tark_q/views/filter-page.dart';
 import 'package:tark_q/views/login-page.dart';
 import 'package:tark_q/views/navbar-views/home-page.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
 import 'package:tark_q/views/raid-form.dart';
-
 import '../globals.dart';
 
 class NavBar extends StatefulWidget {
@@ -17,6 +18,8 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   late int _selectedIndex;
+  Map<String, String> filters = {};
+  final List<Text> _titles = [Text('Looking for Raid'), Text('Profile')];
 
   @override
   void initState() {
@@ -24,127 +27,129 @@ class _NavBarState extends State<NavBar> {
     _selectedIndex = widget.initialIndex;
   }
 
-  final List<Widget> _pages = [Home(), const Profile()];
-  final List<Text> _pagesTitles = [Text('Looking for Raid'), Text('Profile')];
+  void _onItemTapped(int index) => setState(() => _selectedIndex = index);
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  TextStyle _titleStyle(BuildContext context) => TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: isTablet(context) ? 28 : 22,
+  );
+
+  TextStyle _dialogTextStyle(BuildContext context, {Color? color}) => TextStyle(
+    fontSize: isTablet(context) ? 22 : 16,
+    color: color ?? Colors.black,
+    fontWeight: FontWeight.bold,
+  );
+
+  void _showLogoutDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder:
+          (_) => CupertinoAlertDialog(
+            title: Text('Are you sure?', style: _dialogTextStyle(context)),
+            content: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                'You will be logged out.',
+                style: TextStyle(fontSize: isTablet(context) ? 20 : 14),
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                child: Text('Yes', style: _dialogTextStyle(context)),
+                onPressed: () {
+                  userServices.signOutUser();
+                  Navigator.of(context).pushReplacement(
+                    CupertinoPageRoute(builder: (_) => Login()),
+                  );
+                },
+              ),
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: Text(
+                  'No',
+                  style: _dialogTextStyle(context, color: Colors.redAccent),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isOnHome = _selectedIndex == 0;
+
+    final List<Widget> pages = [Home(filters), Profile()];
+
     return PopScope(
       canPop: false,
       child: Scaffold(
         backgroundColor: Colors.black12,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          leadingWidth: 100,
-          title: _pagesTitles[_selectedIndex],
-          actions: [
-            if (_selectedIndex == 0)
-              IconButton(
-                color: Colors.lightGreenAccent,
-                icon: Icon(Icons.add, size: isTablet(context) ? 36 : 30),
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (context) => RaidForm()));
-                },
-              ),
-            if (_selectedIndex == 1)
-              IconButton(
-                color: Colors.redAccent,
-                icon: Icon(Icons.logout, size: isTablet(context) ? 36 : 26),
-                onPressed:
-                    () => {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.grey.shade200,
-                            title: Text('Are you sure?'),
-                            titleTextStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              fontSize: isTablet(context) ? 26 : 22,
-                            ),
-                            content: Text(
-                              'You will be logged out.',
-                              style: TextStyle(
-                                fontSize: isTablet(context) ? 20 : 14,
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                child: Text(
-                                  'Yes',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: isTablet(context) ? 22 : 16,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  userServices.signOutUser();
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (context) => Login(),
-                                    ),
-                                  );
-                                },
-                              ),
-                              TextButton(
-                                child: Text(
-                                  'No',
-                                  style: TextStyle(
-                                    color: Colors.redAccent,
-                                    fontSize: isTablet(context) ? 22 : 16,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+          title: _titles[_selectedIndex],
+          titleTextStyle: _titleStyle(context),
+          backgroundColor: Colors.black,
+          leading:
+              isOnHome
+                  ? IconButton(
+                    onPressed: () async {
+                      final userFilters = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => FilterPage()),
+                      );
+
+                      if (userFilters != null &&
+                          userFilters is Map<String, String>) {
+                        // Optionally:
+                        setState(() {
+                          filters = userFilters;
+                        });
+                      }
                     },
+                    color: Colors.white,
+                    icon: Icon(Icons.tune, size: 24),
+                  )
+                  : SizedBox(),
+
+          actions: [
+            if (isOnHome)
+              IconButton(
+                icon: Icon(Icons.add, size: isTablet(context) ? 36 : 28),
+                color: Colors.lightGreenAccent,
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => RaidForm()),
+                    ),
+              ),
+            if (!isOnHome)
+              IconButton(
+                icon: Icon(Icons.logout, size: isTablet(context) ? 36 : 24),
+                color: Colors.redAccent,
+                onPressed: _showLogoutDialog,
               ),
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1.0),
             child: Container(
-              color:
-                  _selectedIndex == 0
-                      ? Colors.grey.withAlpha(75)
-                      : Colors.transparent,
               height: 1.0,
+              color: isOnHome ? Colors.grey.withAlpha(75) : Colors.transparent,
             ),
           ),
-          backgroundColor: Colors.black,
-          titleTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet(context) ? 28 : 22,
-          ),
         ),
-        body: _pages[_selectedIndex],
+        body: pages[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
-          selectedItemColor: Colors.lightGreenAccent,
-          selectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet(context) ? 28 : 15,
-          ),
-          unselectedItemColor: Colors.grey,
-          unselectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet(context) ? 28 : 15,
-          ),
           backgroundColor: Colors.transparent,
-          items: <BottomNavigationBarItem>[
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Colors.lightGreenAccent,
+          unselectedItemColor: Colors.grey,
+          selectedLabelStyle: _dialogTextStyle(context),
+          unselectedLabelStyle: _dialogTextStyle(context),
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.public, size: isTablet(context) ? 28 : 22),
               label: 'LFR',
@@ -154,8 +159,6 @@ class _NavBarState extends State<NavBar> {
               label: 'Profile',
             ),
           ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
         ),
       ),
     );

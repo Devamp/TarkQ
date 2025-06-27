@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:tark_q/components/nav-bar.dart';
-
 import '../globals.dart';
 
 class WelcomeIntro extends StatelessWidget {
   const WelcomeIntro({super.key});
 
   Widget welcomeModule(IconData icon, String text, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white10,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.lightGreenAccent.withOpacity(0.3)),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             icon,
             color: Colors.lightGreenAccent,
-            size: isTablet(context) ? 55 : 35,
+            size: isTablet(context) ? 50 : 32,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               text,
-              textAlign: TextAlign.left,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isTablet(context) ? 26 : 15,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.none,
+                fontSize: isTablet(context) ? 22 : 16,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
               ),
             ),
           ),
@@ -40,109 +43,109 @@ class WelcomeIntro extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Colors.black87],
-          ),
-        ),
-        padding: EdgeInsets.only(top: 60, left: 20, right: 20, bottom: 60),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.lightGreenAccent, width: 1.0),
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(20),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.black, Colors.black87],
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             child: Column(
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Welcome',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 45,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.waving_hand_rounded,
-                      color: Colors.lightGreenAccent,
-                      size: 45,
-                    ),
-                  ],
+                Text(
+                  'Welcome',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isTablet(context) ? 48 : 38,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
                 ),
-                Divider(
+                const SizedBox(height: 8),
+                const Icon(
+                  Icons.waving_hand_rounded,
+                  color: Colors.lightGreenAccent,
+                  size: 42,
+                ),
+                const SizedBox(height: 16),
+                const Divider(
                   color: Colors.grey,
                   thickness: 2.0,
                   indent: 75,
                   endIndent: 75,
                 ),
-                SizedBox(height: 5),
-
-                welcomeModule(
-                  Icons.add,
-                  "Click the + button on the home LFR page to create your raid ticket.",
-                  context,
+                const SizedBox(height: 12),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        welcomeModule(
+                          Icons.add,
+                          "Get started by clicking the + button on the home page to create your first raid ticket.",
+                          context,
+                        ),
+                        welcomeModule(
+                          Icons.public,
+                          "Visit the Looking for Raid page to view active raid tickets from other users to find your next squad!",
+                          context,
+                        ),
+                        welcomeModule(
+                          Icons.person,
+                          "You can view/delete your active raid tickets and account info under the profile page.",
+                          context,
+                        ),
+                        welcomeModule(
+                          Icons.verified_outlined,
+                          "Show off your achievements from the profile page.",
+                          context,
+                        ),
+                        welcomeModule(
+                          Icons.build_circle_outlined,
+                          "This app is under continuous development.",
+                          context,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                welcomeModule(
-                  Icons.public,
-                  "Visit the Looking for Raid page to view active raid tickets from other users to find your next squad!",
-                  context,
-                ),
-                welcomeModule(
-                  Icons.person,
-                  "You can view your active raid tickets and account info under the account page.",
-                  context,
-                ),
-                welcomeModule(
-                  Icons.star,
-                  "Check back for regular updates and improvements.",
-                  context,
-                ),
-                welcomeModule(
-                  Icons.build_circle_outlined,
-                  "This app is under continuous development.",
-                  context,
-                ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(
-                      context,
-                    ).push(MaterialPageRoute(builder: (context) => NavBar()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const NavBar()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.lightGreenAccent,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 50,
-                      vertical: 8,
+                      horizontal: 40,
+                      vertical: 10,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    elevation: 6,
                   ),
-                  child: IntrinsicWidth(
-                    child: Row(
-                      children: [
-                        const Text(
-                          'LET\'S GO',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text(
+                        'Let\'s Go',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.1,
                         ),
-                        Icon(Icons.arrow_right, color: Colors.black, size: 30),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: 10),
+                      Icon(Icons.arrow_right_alt, size: 28),
+                    ],
                   ),
                 ),
               ],

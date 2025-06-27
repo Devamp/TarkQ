@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-class ErrorCodes {}
-
 String? getErrorMessageFromCode(String code, FirebaseAuthException e) {
   switch (code) {
     case 'invalid-credential':

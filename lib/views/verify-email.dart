@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tark_q/components/nav-bar.dart';
-import 'package:tark_q/views/navbar-views/home-page.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
 import 'package:tark_q/views/signup-page.dart';
-import 'dart:math';
-
 import 'package:tark_q/views/welcome-intro.dart';
+import 'dart:async';
 
 class VerifyEmail extends StatefulWidget {
   const VerifyEmail({super.key});
@@ -18,13 +16,16 @@ class _VerifyEmailState extends State<VerifyEmail>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _shakeAnimation;
+  Timer? timer;
   bool verificationStatus = false;
   bool initialLoad = true;
   bool emailResent = false;
 
   @override
+  @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
@@ -34,6 +35,26 @@ class _VerifyEmailState extends State<VerifyEmail>
       begin: -4,
       end: 4,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticIn));
+
+    timer = Timer.periodic(Duration(seconds: 3), (Timer t) async {
+      final status = await userServices.verifyUserVerification();
+
+      if (!mounted) return;
+
+      if (status != null) {
+        setState(() {
+          verificationStatus = status;
+          initialLoad = false;
+        });
+
+        if (status) {
+          timer?.cancel();
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => WelcomeIntro()));
+        }
+      }
+    });
   }
 
   @override
@@ -90,68 +111,15 @@ class _VerifyEmailState extends State<VerifyEmail>
               ),
               const Text(
                 textAlign: TextAlign.center,
-                'Please check your inbox for the verification link. Once verified, click the button below!',
+                'Please check your inbox/spam folder for the verification link. Once verified, you will be automatically redirected.',
                 style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  final status = await userServices.verifyUserVerification();
-                  setState(() {
-                    verificationStatus = status!;
-                    initialLoad = false;
-                  });
-                  if (status!) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => WelcomeIntro()),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreenAccent,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 50,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-                child: IntrinsicWidth(
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.refresh_outlined,
-                        color: Colors.black,
-                        size: 22,
-                      ),
-                      SizedBox(width: 5),
-                      const Text(
-                        'Verify',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              SizedBox(height: 30),
+              LoadingAnimationWidget.fourRotatingDots(
+                color: Colors.lightGreenAccent,
+                size: 50,
               ),
-              SizedBox(height: 8),
-              const Text(
-                textAlign: TextAlign.center,
-                'Make sure to check the SPAM folder!',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              SizedBox(height: 8),
-              !verificationStatus && !initialLoad
-                  ? Text(
-                    'Email is still unverified, please try again.',
-                    style: TextStyle(color: Colors.redAccent, fontSize: 16),
-                  )
-                  : SizedBox(),
-              Spacer(),
+              SizedBox(height: 30),
               emailResent
                   ? const Text(
                     'Email sent!',
@@ -170,10 +138,10 @@ class _VerifyEmailState extends State<VerifyEmail>
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
+                  backgroundColor: Colors.lightGreenAccent,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 50,
+                    horizontal: 30,
                     vertical: 10,
                   ),
                   shape: RoundedRectangleBorder(

@@ -88,7 +88,7 @@ class Landing extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 35),
+            SizedBox(height: 18),
             Padding(
               padding: const EdgeInsets.only(left: 10.0),
               child: ElevatedButton(
@@ -103,7 +103,7 @@ class Landing extends StatelessWidget {
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 35,
-                    vertical: 8,
+                    vertical: 10,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),

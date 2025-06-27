@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:tark_q/components/raid-ticket.dart';
 import 'package:tark_q/services/user-services.dart';
-
 import '../../globals.dart';
 
 class Home extends StatelessWidget {
-  Home({super.key});
-
+  final Map<String, String> filters;
   final UserServices userServices = UserServices.instance;
+
+  Home(this.filters, {super.key});
 
   Future<List<Map<String, dynamic>>> _loadRaidTickets() async {
     await userServices.loadUserOnLogin();
 
-    final rawList = await userServices.fetchRaidTickets(
+    final rawList = await userServices.getDisplayRaidTickets(
       userServices.getUserEmail(),
+      filters,
     );
 
     // Ensure type safety by casting each item
@@ -35,15 +36,7 @@ class Home extends StatelessWidget {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          final data = snapshot.data ?? [];
-
-          // data = List<Map<String, dynamic>>
-          final List<dynamic> allTickets = [];
-
-          for (var doc in data) {
-            final tickets = doc['tickets'] ?? [];
-            allTickets.addAll(tickets);
-          }
+          final List<Map<String, dynamic>> allTickets = snapshot.data ?? [];
 
           return SingleChildScrollView(
             child: Padding(
@@ -53,13 +46,35 @@ class Home extends StatelessWidget {
                       ? Center(
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
-                          child: Text(
-                            "Could not find any raid tickets.",
-                            style: TextStyle(
-                              color: Colors.lightGreenAccent,
-                              fontSize: isTablet(context) ? 24 : 18,
-                            ),
-                          ),
+                          child:
+                              filters != {}
+                                  ? Column(
+                                    children: [
+                                      Text(
+                                        "Could not find any raid tickets.",
+                                        style: TextStyle(
+                                          color: Colors.lightGreenAccent,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: isTablet(context) ? 24 : 18,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Try updating your filters again.",
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: isTablet(context) ? 24 : 14,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                  : Text(
+                                    "Could not find any raid tickets.",
+                                    style: TextStyle(
+                                      color: Colors.lightGreenAccent,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: isTablet(context) ? 24 : 18,
+                                    ),
+                                  ),
                         ),
                       )
                       : Column(

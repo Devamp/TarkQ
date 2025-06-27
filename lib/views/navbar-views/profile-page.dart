@@ -40,15 +40,15 @@ class _ProfileState extends State<Profile> {
               children: [
                 ProfilePicture(
                   name: username.toUpperCase(),
-                  radius: isTablet(context) ? 70 : 60,
-                  fontsize: isTablet(context) ? 44 : 40,
+                  radius: isTablet(context) ? 70 : 40,
+                  fontsize: isTablet(context) ? 44 : 30,
                 ),
                 SizedBox(height: 10),
                 Text(
                   username,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: isTablet(context) ? 32 : 24,
+                    fontSize: isTablet(context) ? 32 : 22,
                     color: Colors.white,
                   ),
                 ),
@@ -155,7 +155,7 @@ class _ProfileState extends State<Profile> {
   Future<List<Map<String, dynamic>>> _loadRaidTickets() async {
     await userServices.loadUserOnLogin();
 
-    final rawList = await userServices.fetchUserRaidTickets(
+    final rawList = await userServices.getUserRaidTickets(
       userServices.getUserEmail(),
     );
 
@@ -180,13 +180,7 @@ class _ProfileState extends State<Profile> {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
 
-            final data = snapshot.data ?? [];
-
-            final List<dynamic> allTickets = [];
-            for (var doc in data) {
-              final tickets = doc['tickets'] ?? [];
-              allTickets.addAll(tickets);
-            }
+            final List<Map<String, dynamic>> allTickets = snapshot.data ?? [];
 
             return Column(
               children: [
@@ -209,9 +203,6 @@ class _ProfileState extends State<Profile> {
                             ),
                           )
                           : ListView.builder(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 5.0,
-                            ),
                             itemCount: allTickets.length,
                             itemBuilder: (context, index) {
                               return RaidTicket(data: allTickets[index]);

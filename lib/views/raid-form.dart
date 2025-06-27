@@ -327,7 +327,7 @@ class _RaidFormState extends State<RaidForm> {
             cursorColor: Colors.white,
             controller: _contactIdController,
             keyboardType: TextInputType.text,
-            maxLength: 20,
+            maxLength: 13,
             inputFormatters: [
               FilteringTextInputFormatter.deny(RegExp(r'\s')),
               LengthLimitingTextInputFormatter(20),
@@ -336,7 +336,7 @@ class _RaidFormState extends State<RaidForm> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.black,
-              hintText: "i.e Nikita#9999 or MyTarkovUserName...",
+              hintText: "Enter your discord or tarkov username...",
               hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20.0),
@@ -364,9 +364,6 @@ class _RaidFormState extends State<RaidForm> {
               if (value.contains(' ')) {
                 return 'Spaces are not allowed';
               }
-              if (!value.contains('#') && contactMethodValue == "Discord") {
-                return 'Discord username is invalid (are you missing a "#"?)';
-              }
               return null;
             },
           ),
@@ -384,10 +381,8 @@ class _RaidFormState extends State<RaidForm> {
             IconButton(
               color: Colors.red,
               icon: const Icon(Icons.cancel_outlined, size: 30),
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => NavBar()));
+              onPressed: () async {
+                Navigator.of(context).pop(context);
               },
             ),
           ],
@@ -411,12 +406,11 @@ class _RaidFormState extends State<RaidForm> {
                     decoration: TextDecoration.none,
                   ),
                 ),
-                SizedBox(height: 5),
                 Text(
                   'Create and submit a raid ticket with your raid preference.',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.grey,
                     fontSize: isTablet(context) ? 20 : 14,
                     decoration: TextDecoration.none,
                     fontWeight: FontWeight.normal,
@@ -444,13 +438,13 @@ class _RaidFormState extends State<RaidForm> {
                   ),
                 ),
                 raidInfo(),
-                Divider(height: 40, color: Colors.white),
+                Divider(height: 20, color: Colors.white),
                 Center(
                   child: Text(
                     'Please verify your discord or tarkov username again before submitting.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.grey,
                       fontSize: isTablet(context) ? 20 : 14,
                       decoration: TextDecoration.none,
                       fontWeight: FontWeight.normal,
@@ -462,18 +456,13 @@ class _RaidFormState extends State<RaidForm> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // Form is valid, proceed with submission
                         setState(() {
-                          isLoading = !isLoading;
+                          isLoading = true;
                         });
 
-                        List<Map<String, dynamic>> tickets = await userServices
-                            .fetchUserRaidTickets(userServices.getUserEmail());
-
-                        if (tickets.first['tickets'].length < 3) {
-                          // Allow ticket creation
+                        if (userServices.getNumRaidTickets() < 3) {
+                          // Create the ticket
                           Map<String, dynamic> ticketData = {
-                            'ticketId': tickets.first['tickets'].length,
                             'username': userServices.getUsername(),
                             'pmcFaction': pmcFactionValue,
                             'pmcLevel': pmcLevelValue,
@@ -483,7 +472,6 @@ class _RaidFormState extends State<RaidForm> {
                             'contactMethod': contactMethodValue,
                             'contactId': _contactIdController.text,
                             'createdAt': Timestamp.now(),
-                            'userEmail': userServices.getUserEmail(),
                           };
 
                           await dataAccess.createRaidTicket(
@@ -492,51 +480,47 @@ class _RaidFormState extends State<RaidForm> {
                           );
 
                           if (mounted) {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (context) => NavBar()),
-                            );
+                            Navigator.pop(
+                              context,
+                            ); // ✅ Use pop() instead of pushReplacement
                           }
                         } else {
+                          setState(() {
+                            isLoading = false;
+                          });
+
                           if (mounted) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                          // Show alert if tickets >= 10
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Limit reached'),
-                                titleTextStyle: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  fontSize: 22,
-                                ),
-                                content: Text(
-                                  'You cannot have more than 3 active tickets at a time. Please delete an existing ticket.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: Text(
-                                      'Ok',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => NavBar(),
-                                        ),
-                                      );
-                                    },
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Limit reached'),
+                                  titleTextStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 22,
                                   ),
-                                ],
-                              );
-                            },
-                          );
+                                  content: Text(
+                                    'You cannot have more than 3 active tickets at a time. Please delete an existing ticket.',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      child: Text(
+                                        'Ok',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
                         }
                       }
                     },
@@ -558,13 +542,13 @@ class _RaidFormState extends State<RaidForm> {
                                 children: [
                                   LoadingAnimationWidget.inkDrop(
                                     color: Colors.black,
-                                    size: 30,
+                                    size: 22,
                                   ),
                                   SizedBox(width: 10),
                                   Text(
                                     'Processing...',
                                     style: TextStyle(
-                                      fontSize: isTablet(context) ? 24 : 20,
+                                      fontSize: isTablet(context) ? 24 : 18,
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                     ),

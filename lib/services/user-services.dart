@@ -58,30 +58,34 @@ class UserServices {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchRaidTickets(String userEmail) async {
+  Future<List<Map<String, dynamic>>> getDisplayRaidTickets(
+    String userEmail, [
+    Map<String, String>? filters,
+  ]) async {
     try {
-      return await dataAccess.fetchRaidTickets(userEmail, ticketIdx, 5);
+      if (filters == null || filters.isEmpty) {
+        return await dataAccess.getDisplayRaidTickets(userEmail);
+      } else {
+        return await dataAccess.getDisplayRaidTickets(userEmail, filters);
+      }
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchUserRaidTickets(
+  Future<List<Map<String, dynamic>>> getUserRaidTickets(
     String userEmail,
   ) async {
     try {
-      return await dataAccess.fetchUserRaidTickets(userEmail);
+      return await dataAccess.getUserRaidTickets(userEmail);
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<List<Map<String, dynamic>>> deleteUserTicket(
-    String userEmail,
-    int ticketId,
-  ) async {
+  Future<void> deleteUserTicket(String userEmail, String ticketDocId) async {
     try {
-      return await dataAccess.deleteUserTicket(userEmail, ticketId);
+      return await dataAccess.deleteUserTicket(userEmail, ticketDocId);
     } catch (e) {
       rethrow;
     }
@@ -134,11 +138,6 @@ class UserServices {
     }
   }
 
-  Future<void> setTicketIdx(int idx) async {
-    ticketIdx = idx;
-    await dataAccess.fetchRaidTickets(getUserEmail(), ticketIdx, 5);
-  }
-
   String getUsername() {
     userData?.data() as Map<String, dynamic>?;
 
@@ -146,6 +145,18 @@ class UserServices {
 
     if (username != null) {
       return username;
+    }
+
+    throw Exception('Failed to get username');
+  }
+
+  int getNumRaidTickets() {
+    userData?.data() as Map<String, dynamic>?;
+
+    final int? numRaidTickets = userData?['numRaidTickets'] as int?;
+
+    if (numRaidTickets != null) {
+      return numRaidTickets;
     }
 
     throw Exception('Failed to get username');
@@ -172,7 +183,7 @@ class UserServices {
 
   Future<List<String?>> getUserAchievements(String email) async {
     final doc =
-        await FirebaseFirestore.instance.collection('User').doc(email).get();
+        await FirebaseFirestore.instance.collection('Users').doc(email).get();
 
     final data = doc.data();
     if (data != null && data['achievements'] is List) {
