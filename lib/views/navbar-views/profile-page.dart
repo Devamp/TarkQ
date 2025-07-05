@@ -94,9 +94,12 @@ class _ProfileState extends State<Profile> {
                 ),
                 SizedBox(height: 10),
                 userAchievements.whereType<String>().isEmpty
-                    ? Text(
-                      'No achievements selected',
-                      style: TextStyle(color: Colors.grey),
+                    ? Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Text(
+                        'Click the pencil icon to add achievements',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     )
                     : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +123,6 @@ class _ProfileState extends State<Profile> {
                               })
                               .toList(),
                     ),
-                SizedBox(height: 12),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.black,
@@ -185,7 +187,6 @@ class _ProfileState extends State<Profile> {
             return Column(
               children: [
                 buildProfileHeader(context), // Fixed top header
-                const SizedBox(height: 10),
                 Expanded(
                   // This makes only the ticket list scrollable
                   child:
@@ -203,6 +204,7 @@ class _ProfileState extends State<Profile> {
                             ),
                           )
                           : ListView.builder(
+                            padding: EdgeInsets.zero,
                             itemCount: allTickets.length,
                             itemBuilder: (context, index) {
                               return RaidTicket(data: allTickets[index]);

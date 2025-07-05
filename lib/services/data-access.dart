@@ -60,14 +60,11 @@ class DataAccess {
     Map<String, String>? filters,
   ]) async {
     try {
-      // Fetch tickets NOT by the user, ordered by timestamp desc
       final snapshot =
           await FirebaseFirestore.instance
               .collection('RaidTickets')
               .where('userEmail', isNotEqualTo: userEmail)
-              .orderBy(
-                'userEmail',
-              ) // Required by Firestore with where 'isNotEqualTo'
+              .orderBy('userEmail') // Required when using isNotEqualTo
               .orderBy('timestamp', descending: true)
               .get();
 
@@ -83,9 +80,8 @@ class DataAccess {
         return allTickets;
       }
 
-      // Apply filters locally
       return allTickets.where((ticket) {
-        // Example: filter by map
+        // Filter by map
         if (filters.containsKey('map') && filters['map'] != 'Any') {
           if (ticket['map'] != filters['map']) return false;
         }
@@ -95,10 +91,11 @@ class DataAccess {
           if (ticket['goal'] != filters['goal']) return false;
         }
 
-        // Filter by party size (as string)
+        // Filter by party size
         if (filters.containsKey('partySize') && filters['partySize'] != 'Any') {
-          if (ticket['partySize']?.toString() != filters['partySize'])
+          if (ticket['maxPartySize']?.toString() != filters['partySize']) {
             return false;
+          }
         }
 
         // Filter by contact method
@@ -107,12 +104,23 @@ class DataAccess {
           if (ticket['contactMethod'] != filters['contactMethod']) return false;
         }
 
-        // Filter by PMC level (minimum level)
+        // Filter by PMC level (minimum)
         if (filters.containsKey('pmcLevel') && filters['pmcLevel'] != 'Any') {
           int ticketLevel =
               int.tryParse(ticket['pmcLevel']?.toString() ?? '0') ?? 0;
           int minLevel = int.tryParse(filters['pmcLevel']!) ?? 0;
           if (ticketLevel < minLevel) return false;
+        }
+
+        // Filter by game mode
+        if (filters.containsKey('gameMode') && filters['gameMode'] != 'Any') {
+          if (ticket['gameMode'] != filters['gameMode']) return false;
+        }
+
+        // Filter by skill rating
+        if (filters.containsKey('skillRating') &&
+            filters['skillRating'] != 'Any') {
+          if (ticket['skillRating'] != filters['skillRating']) return false;
         }
 
         return true;

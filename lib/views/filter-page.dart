@@ -15,9 +15,19 @@ class _FilterPageState extends State<FilterPage> {
   String goalValue = 'Any';
   String partySizeValue = 'Any';
   String contactMethodValue = 'Any';
-  String pmcFactionValue = 'Any';
   String pmcLevelValue = 'Any';
+  String gameModeValue = 'Any';
+  String skillRatingValue = 'Any';
   bool isLoading = false;
+
+  static const List<String> gameModeOptions = <String>['PVP', 'PVE'];
+
+  static const List<String> skillRatingOptions = <String>[
+    'New',
+    'Intermediate',
+    'Experienced',
+    'Tarkov Veteran',
+  ];
 
   static const List<String> mapOptions = <String>[
     'Any',
@@ -69,6 +79,10 @@ class _FilterPageState extends State<FilterPage> {
         return contactMethodValue;
       case "Min PMC Level":
         return pmcLevelValue;
+      case "Game Mode":
+        return gameModeValue;
+      case "Skill Rating":
+        return skillRatingValue;
       default:
         return 'Any';
     }
@@ -92,6 +106,12 @@ class _FilterPageState extends State<FilterPage> {
         case "Min PMC Level":
           pmcLevelValue = value;
           break;
+        case "Game Mode":
+          gameModeValue = value;
+          break;
+        case "Skill Rating":
+          skillRatingValue = value;
+          break;
       }
     });
   }
@@ -108,6 +128,10 @@ class _FilterPageState extends State<FilterPage> {
         return contactMethodOptions;
       case "Min PMC Level":
         return pmcLevelOptions;
+      case "Game Mode":
+        return gameModeOptions;
+      case "Skill Rating":
+        return skillRatingOptions;
       default:
         return [];
     }
@@ -252,113 +276,128 @@ class _FilterPageState extends State<FilterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      child: SafeArea(
+        child: Scaffold(
           backgroundColor: Colors.black,
-          iconTheme: IconThemeData(color: Colors.white, size: 20),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Filter Raid Tickets',
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  color: Colors.lightGreenAccent,
-                  fontSize: isTablet(context) ? 28 : 30,
-                  fontWeight: FontWeight.bold,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            leading: IconButton(
+              icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+
+          body: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Filter Raid Tickets',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: Colors.lightGreenAccent,
+                    fontSize: isTablet(context) ? 28 : 30,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                'Apply unique ticket filters below to find exactly what you are looking for.',
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: isTablet(context) ? 28 : 14,
-                ),
-              ),
-              SizedBox(height: 15),
-              filterField(Icons.location_on_outlined, 'Map'),
-              filterField(Icons.flag, 'Goal'),
-              filterField(Icons.diversity_3_rounded, 'Max Party Size'),
-              filterField(Icons.contacts, 'Contact Method'),
-              filterField(Icons.equalizer, 'Min PMC Level'),
-              SizedBox(height: 20),
-              Center(
-                child: Text(
-                  'Reset filters by just clicking the button below.',
+                Text(
+                  'Apply unique ticket filters below to find exactly what you are looking for.',
                   textAlign: TextAlign.start,
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: isTablet(context) ? 28 : 14,
                   ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isLoading = true;
-                    });
-
-                    Map<String, String> filters = {
-                      'map': mapValue,
-                      'goal': goalValue,
-                      'partySize': partySizeValue,
-                      'contactMethod': contactMethodValue,
-                      'pmcFaction': pmcFactionValue,
-                      'pmcLevel': pmcLevelValue,
-                    };
-
-                    setState(() {
-                      isLoading = false;
-                    });
-
-                    Navigator.pop(context, filters);
-                  },
-
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreenAccent,
-                    foregroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                SizedBox(height: 15),
+                filterField(Icons.location_on_outlined, 'Map'),
+                filterField(Icons.flag, 'Goal'),
+                filterField(Icons.compare_arrows_rounded, 'Game Mode'),
+                filterField(Icons.star, 'Skill Rating'),
+                filterField(Icons.diversity_3_rounded, 'Max Party Size'),
+                filterField(Icons.contacts, 'Contact Method'),
+                filterField(Icons.equalizer, 'Min PMC Level'),
+                SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    'Reset filters by just clicking the button below.',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: isTablet(context) ? 28 : 14,
                     ),
                   ),
-                  child:
-                      isLoading
-                          ? Row(
-                            children: [
-                              LoadingAnimationWidget.inkDrop(
-                                color: Colors.black,
-                                size: 22,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                'Applying...',
-                                style: TextStyle(
-                                  fontSize: isTablet(context) ? 24 : 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          )
-                          : Text(
-                            'Apply Filters',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
                 ),
-              ),
-            ],
+                SizedBox(height: 5),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      Map<String, String> filters = {
+                        'map': mapValue,
+                        'goal': goalValue,
+                        'partySize': partySizeValue,
+                        'contactMethod': contactMethodValue,
+                        'pmcLevel': pmcLevelValue,
+                        'gameMode': gameModeValue,
+                        'skillRating': skillRatingValue,
+                      };
+
+                      setState(() {
+                        isLoading = false;
+                      });
+
+                      Navigator.pop(context, filters);
+                    },
+
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightGreenAccent,
+                      foregroundColor: Colors.black,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 25,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child:
+                        isLoading
+                            ? Row(
+                              children: [
+                                LoadingAnimationWidget.inkDrop(
+                                  color: Colors.black,
+                                  size: 22,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Applying...',
+                                  style: TextStyle(
+                                    fontSize: isTablet(context) ? 24 : 16,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            )
+                            : Text(
+                              'Apply Filters',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

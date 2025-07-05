@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:tark_q/components/nav-bar.dart';
 import 'package:tark_q/services/data-access.dart';
 import 'package:tark_q/services/user-services.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +22,9 @@ class _RaidFormState extends State<RaidForm> {
   String contactMethodValue = 'Discord';
   String pmcFactionValue = 'BEAR';
   String pmcLevelValue = '1';
+  String gameModeValue = 'PVP';
+  String userHoursValue = '100+';
+  String skillRatingValue = 'New';
 
   bool isLoading = false;
   final _contactIdController = TextEditingController();
@@ -36,6 +38,28 @@ class _RaidFormState extends State<RaidForm> {
     _contactIdController.dispose();
     super.dispose();
   }
+
+  static const List<String> gameModeOptions = <String>['PVP', 'PVE'];
+
+  static const List<String> userHoursOptions = <String>[
+    'under 50',
+    '100+',
+    '100+',
+    '500+',
+    '1000+',
+    '1500+',
+    '2000+',
+    '5000+',
+    '8000+',
+    '10000+',
+  ];
+
+  static const List<String> skillRatingOptions = <String>[
+    'New',
+    'Intermediate',
+    'Experienced',
+    'Tarkov Veteran',
+  ];
 
   static const List<String> mapOptions = <String>[
     'Shoreline',
@@ -65,7 +89,7 @@ class _RaidFormState extends State<RaidForm> {
   ];
 
   static final List<String> pmcLevelOptions = List.generate(
-    100,
+    79,
     (index) => (index + 1).toString(),
   );
 
@@ -85,6 +109,12 @@ class _RaidFormState extends State<RaidForm> {
         return pmcFactionValue;
       case "PMC Level":
         return pmcLevelValue;
+      case "Mode":
+        return gameModeValue;
+      case "In-Game Hours":
+        return userHoursValue;
+      case "Skill Rating":
+        return skillRatingValue;
       default:
         return '';
     }
@@ -110,6 +140,15 @@ class _RaidFormState extends State<RaidForm> {
       case "PMC Level":
         pmcLevelValue = value;
         break;
+      case "Mode":
+        gameModeValue = value;
+        break;
+      case "In-Game Hours":
+        userHoursValue = value;
+        break;
+      case "Skill Rating":
+        skillRatingValue = value;
+        break;
     }
   }
 
@@ -127,6 +166,12 @@ class _RaidFormState extends State<RaidForm> {
         return pmcFactionOptions;
       case "PMC Level":
         return pmcLevelOptions;
+      case "Mode":
+        return gameModeOptions;
+      case "In-Game Hours":
+        return userHoursOptions;
+      case "Skill Rating":
+        return skillRatingOptions;
       default:
         return [];
     }
@@ -289,6 +334,24 @@ class _RaidFormState extends State<RaidForm> {
     return Column(
       children: [
         formField(Icons.person, 'User', userServices.getUsername(), 'General'),
+        formField(
+          Icons.sports_kabaddi,
+          'Mode',
+          userServices.getUsername(),
+          'Raid',
+        ),
+        formField(
+          Icons.hourglass_bottom,
+          'In-Game Hours',
+          userServices.getUsername(),
+          'Raid',
+        ),
+        formField(
+          Icons.star,
+          'Skill Rating',
+          userServices.getUsername(),
+          'Raid',
+        ),
         formField(Icons.contrast, 'PMC Faction', 'BEAR', 'Raid'),
         formField(Icons.equalizer, 'PMC Level', '48', 'Raid'),
       ],
@@ -301,73 +364,6 @@ class _RaidFormState extends State<RaidForm> {
         formField(Icons.location_on_outlined, 'Map', 'Shoreline', 'Raid'),
         formField(Icons.flag, 'Goal', 'Questing', 'Raid'),
         formField(Icons.diversity_3_rounded, 'Max Party Size', '3', 'Raid'),
-        formField(Icons.contacts, 'Contact Method', 'Discord', 'Raid'),
-        Row(
-          children: [
-            Icon(
-              Icons.person_add,
-              color: Colors.redAccent,
-              size: isTablet(context) ? 24 : 12,
-            ),
-            SizedBox(width: 5),
-            Text(
-              'Discord or Tarkov Id:',
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: isTablet(context) ? 20 : 12,
-                color: Colors.redAccent,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 5),
-        Form(
-          key: _formKey,
-          child: TextFormField(
-            cursorColor: Colors.white,
-            controller: _contactIdController,
-            keyboardType: TextInputType.text,
-            maxLength: 13,
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp(r'\s')),
-              LengthLimitingTextInputFormatter(20),
-            ],
-            style: const TextStyle(color: Colors.lightGreenAccent),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.black,
-              hintText: "Enter your discord or tarkov username...",
-              hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                borderSide: const BorderSide(
-                  color: Colors.redAccent,
-                  width: 1.0,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                borderSide: const BorderSide(color: Colors.red, width: 1.0),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                borderSide: const BorderSide(color: Colors.red, width: 2.0),
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter your Discord or Tarkov username';
-              }
-              if (value.contains(' ')) {
-                return 'Spaces are not allowed';
-              }
-              return null;
-            },
-          ),
-        ),
       ],
     );
   }
@@ -416,28 +412,154 @@ class _RaidFormState extends State<RaidForm> {
                     fontWeight: FontWeight.normal,
                   ),
                 ),
-                SizedBox(height: 15),
-                Text(
-                  'General',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: isTablet(context) ? 32 : 28,
-                    fontWeight: FontWeight.w600,
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withAlpha(75),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'General Details',
+                      style: TextStyle(
+                        color: Colors.lightGreenAccent,
+                        fontSize: isTablet(context) ? 40 : 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 generalInfo(),
-                SizedBox(height: 15),
-                Text(
-                  'Raid',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: isTablet(context) ? 32 : 28,
-                    fontWeight: FontWeight.w600,
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withAlpha(75),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Raid Details',
+                      style: TextStyle(
+                        color: Colors.lightGreenAccent,
+                        fontSize: isTablet(context) ? 40 : 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 raidInfo(),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withAlpha(75),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+
+                    child: Text(
+                      'Contact Details',
+                      style: TextStyle(
+                        color: Colors.lightGreenAccent,
+                        fontSize: isTablet(context) ? 40 : 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                formField(Icons.contacts, 'Contact Method', 'Discord', 'Raid'),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person_add,
+                      color: Colors.redAccent,
+                      size: isTablet(context) ? 24 : 12,
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      'Discord or Tarkov Id:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: isTablet(context) ? 20 : 12,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 5),
+                Form(
+                  key: _formKey,
+                  child: TextFormField(
+                    cursorColor: Colors.white,
+                    controller: _contactIdController,
+                    keyboardType: TextInputType.text,
+                    maxLength: 13,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                      LengthLimitingTextInputFormatter(20),
+                    ],
+                    style: const TextStyle(color: Colors.lightGreenAccent),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.black,
+                      hintText: "Enter your discord or tarkov username...",
+                      hintStyle: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: const BorderSide(
+                          color: Colors.redAccent,
+                          width: 1.0,
+                        ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 1.0,
+                        ),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter your Discord or Tarkov username';
+                      }
+                      if (value.contains(' ')) {
+                        return 'Spaces are not allowed';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
                 Divider(height: 20, color: Colors.white),
                 Center(
                   child: Text(
@@ -464,6 +586,9 @@ class _RaidFormState extends State<RaidForm> {
                           // Create the ticket
                           Map<String, dynamic> ticketData = {
                             'username': userServices.getUsername(),
+                            'gameMode': gameModeValue,
+                            'userHours': userHoursValue,
+                            'skillRating': skillRatingValue,
                             'pmcFaction': pmcFactionValue,
                             'pmcLevel': pmcLevelValue,
                             'map': mapValue,
@@ -480,9 +605,7 @@ class _RaidFormState extends State<RaidForm> {
                           );
 
                           if (mounted) {
-                            Navigator.pop(
-                              context,
-                            ); // ✅ Use pop() instead of pushReplacement
+                            Navigator.pop(context);
                           }
                         } else {
                           setState(() {

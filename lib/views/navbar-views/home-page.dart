@@ -39,51 +39,48 @@ class Home extends StatelessWidget {
           final List<Map<String, dynamic>> allTickets = snapshot.data ?? [];
 
           return SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(5.0),
-              child:
-                  allTickets.isEmpty
-                      ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child:
-                              filters != {}
-                                  ? Column(
-                                    children: [
-                                      Text(
-                                        "Could not find any raid tickets.",
-                                        style: TextStyle(
-                                          color: Colors.lightGreenAccent,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: isTablet(context) ? 24 : 18,
-                                        ),
+            child:
+                allTickets.isEmpty
+                    ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child:
+                            filters != {}
+                                ? Column(
+                                  children: [
+                                    Text(
+                                      "Could not find any raid tickets",
+                                      style: TextStyle(
+                                        color: Colors.lightGreenAccent,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: isTablet(context) ? 24 : 18,
                                       ),
-                                      Text(
-                                        "Try updating your filters again.",
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: isTablet(context) ? 24 : 14,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                  : Text(
-                                    "Could not find any raid tickets.",
-                                    style: TextStyle(
-                                      color: Colors.lightGreenAccent,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: isTablet(context) ? 24 : 18,
                                     ),
+                                    Text(
+                                      "Try clearing any filters",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: isTablet(context) ? 24 : 14,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                                : Text(
+                                  "Could not find any raid tickets.",
+                                  style: TextStyle(
+                                    color: Colors.lightGreenAccent,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isTablet(context) ? 24 : 18,
                                   ),
-                        ),
-                      )
-                      : Column(
-                        children:
-                            allTickets.map((entry) {
-                              return RaidTicket(data: entry);
-                            }).toList(),
+                                ),
                       ),
-            ),
+                    )
+                    : Column(
+                      children:
+                          allTickets.map((entry) {
+                            return RaidTicket(data: entry);
+                          }).toList(),
+                    ),
           );
         },
       ),

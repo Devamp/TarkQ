@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tark_q/views/filter-page.dart';
 import 'package:tark_q/views/login-page.dart';
@@ -19,6 +20,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   late int _selectedIndex;
   Map<String, String> filters = {};
+  bool isFilterApplied = false;
   final List<Text> _titles = [Text('Looking for Raid'), Text('Profile')];
 
   @override
@@ -80,6 +82,15 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     final bool isOnHome = _selectedIndex == 0;
+    const defaultFilters = {
+      'map': 'Any',
+      'goal': 'Any',
+      'partySize': 'Any',
+      'contactMethod': 'Any',
+      'pmcLevel': 'Any',
+      'gameMode': 'Any',
+      'skillRating': 'Any',
+    };
 
     final List<Widget> pages = [Home(filters), Profile()];
 
@@ -103,13 +114,18 @@ class _NavBarState extends State<NavBar> {
 
                       if (userFilters != null &&
                           userFilters is Map<String, String>) {
-                        // Optionally:
                         setState(() {
                           filters = userFilters;
+
+                          isFilterApplied =
+                              !mapEquals(userFilters, defaultFilters);
                         });
                       }
                     },
-                    color: Colors.white,
+                    color:
+                        isFilterApplied
+                            ? Colors.lightGreenAccent
+                            : Colors.white,
                     icon: Icon(Icons.tune, size: 24),
                   )
                   : SizedBox(),

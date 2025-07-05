@@ -67,17 +67,102 @@ Widget getAchievementIconByText(String text) {
         color: Colors.amberAccent,
         size: 40,
       );
+
     case "2 Prestigious":
       return Icon(
         Icons.looks_two_outlined,
         color: Colors.amberAccent,
         size: 40,
       );
-    default:
+
+    case "PvE Master":
+      return Icon(FontAwesomeIcons.tree, color: Colors.amberAccent, size: 35);
+
+    case "Labs Rat":
+      return Icon(Icons.science, color: Colors.amberAccent, size: 35);
+
+    case "Gunsmith":
+      return Icon(FontAwesomeIcons.wrench, color: Colors.amberAccent, size: 30);
+
+    case "Collector":
       return Icon(
-        Icons.not_interested,
+        FontAwesomeIcons.boxOpen,
         color: Colors.amberAccent,
-        size: 40,
-      ); // Fallback to Material
+        size: 30,
+      );
+
+    case "Quest Master":
+      return Icon(
+        Icons.assignment_turned_in,
+        color: Colors.amberAccent,
+        size: 35,
+      );
+
+    case "Survivor":
+      return Icon(
+        FontAwesomeIcons.heartPulse,
+        color: Colors.amberAccent,
+        size: 30,
+      );
+
+    case "Sniper Elite":
+      return Icon(
+        FontAwesomeIcons.crosshairs,
+        color: Colors.amberAccent,
+        size: 30,
+      );
+
+    case "Boss Hunter":
+      return Icon(FontAwesomeIcons.crown, color: Colors.amberAccent, size: 30);
+
+    case "Trader Max":
+      return Icon(
+        FontAwesomeIcons.handshake,
+        color: Colors.amberAccent,
+        size: 30,
+      );
+
+    case "PMC Slayer":
+      return Icon(
+        FontAwesomeIcons.skullCrossbones,
+        color: Colors.amberAccent,
+        size: 30,
+      );
+
+    case "Silent Assassin":
+      return Icon(
+        FontAwesomeIcons.userNinja,
+        color: Colors.amberAccent,
+        size: 30,
+      );
+
+    case "Looter":
+      return Icon(FontAwesomeIcons.box, color: Colors.amberAccent, size: 30);
+
+    case "Chad":
+      return Icon(FontAwesomeIcons.fire, color: Colors.amberAccent, size: 30);
+
+    default:
+      return Icon(Icons.not_interested, color: Colors.amberAccent, size: 40);
   }
+}
+
+Widget buildTicketStatus(Timestamp ticketCreatedAt, String screen) {
+  final dateTime = ticketCreatedAt.toDate().toLocal();
+  final now = DateTime.now();
+  final difference = now.difference(dateTime);
+
+  Color iconColor = Colors.grey;
+
+  if (difference.inHours < 2) {
+    iconColor = Colors.green;
+  } else if (difference.inHours < 8) {
+    iconColor = Colors.yellow;
+  } else if (difference.inHours < 24) {
+    iconColor = Colors.red;
+  } else {
+    iconColor = Colors.grey;
+  }
+
+  return Icon(Icons.circle, color: iconColor, size: screen == "1" ? 18 : 14);
 }

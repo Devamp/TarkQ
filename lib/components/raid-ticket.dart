@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tark_q/views/ticket-view.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
@@ -65,112 +66,121 @@ class _RaidTicketState extends State<RaidTicket> {
     final isDiscord = data['contactMethod'] == "Discord";
     final contactIcon = isDiscord ? Icons.discord : Icons.contacts;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: isTablet(context) ? 10 : 8,
-        horizontal: isTablet(context) ? 15 : 12,
-      ),
-      child: Container(
-        padding: EdgeInsets.all(isTablet(context) ? 10 : 10),
-        decoration: BoxDecoration(
-          color: Colors.white.withAlpha(25),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.lightGreenAccent),
+    return Container(
+      padding: EdgeInsets.all(isTablet(context) ? 10 : 10),
+      decoration: BoxDecoration(
+        color: Colors.black.withAlpha(25),
+        border: Border(
+          top: BorderSide(color: Colors.grey.withAlpha(75)),
+          bottom: BorderSide(color: Colors.grey.withAlpha(75)),
         ),
-        child: Column(
-          children: [
-            // Header Row
-            Row(
-              children: [
-                ProfilePicture(
-                  name: data['username'][0].toUpperCase(),
-                  radius: isTablet(context) ? 28 : 20,
-                  fontsize: isTablet(context) ? 26 : 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  data['username'],
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: isTablet(context) ? 30 : 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                buildInfoRow(Icons.leaderboard, "Lv${data['pmcLevel']}"),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            // Main Info
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        buildInfoRow(Icons.my_location, data['map']),
-                        buildInfoRow(Icons.shield_outlined, data['pmcFaction']),
-                        buildInfoRow(
-                          Icons.diversity_3_rounded,
-                          data['maxPartySize'],
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        buildInfoRow(Icons.flag, data['goal']),
-                        buildInfoRow(contactIcon, data['contactMethod']),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Button
-            SizedBox(
-              width: isTablet(context) ? 250 : 175,
-              child: ElevatedButton(
-                onPressed: navigateToTicketView,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreenAccent,
-                  foregroundColor: Colors.black,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isTablet(context) ? 40 : 15,
-                    vertical: isTablet(context) ? 10 : 5,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.remove_red_eye_sharp,
-                      size: isTablet(context) ? 22 : 16,
-                      color: Colors.black,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontSize: isTablet(context) ? 22 : 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+      ),
+      child: Column(
+        children: [
+          // Header Row
+          Row(
+            children: [
+              ProfilePicture(
+                name: data['username'][0].toUpperCase(),
+                radius: isTablet(context) ? 28 : 20,
+                fontsize: isTablet(context) ? 26 : 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                data['username'],
+                style: TextStyle(
+                  color: Colors.lightGreenAccent,
+                  fontSize: isTablet(context) ? 30 : 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+              SizedBox(width: 3),
+              buildTicketStatus(data['createdAt'], "2"),
+              const Spacer(),
+              Column(
+                children: [
+                  buildInfoRow(Icons.leaderboard, "Lv${data['pmcLevel']}"),
+                  Text(
+                    data['gameMode'] ?? 'PVP',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.lightGreenAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // Main Info
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      buildInfoRow(Icons.my_location, data['map']),
+                      buildInfoRow(Icons.flag, data['goal']),
+                      buildInfoRow(
+                        Icons.diversity_3_rounded,
+                        data['maxPartySize'],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      buildInfoRow(
+                        Icons.hourglass_bottom_sharp,
+                        '${data['userHours'] ?? '< 50'} hours',
+                      ),
+                      buildInfoRow(contactIcon, data['contactMethod']),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Button
+          SizedBox(
+            width: isTablet(context) ? 250 : 160,
+            height: 38,
+            child: ElevatedButton(
+              onPressed: navigateToTicketView,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightGreenAccent,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.remove_red_eye_sharp,
+                    size: isTablet(context) ? 22 : 15,
+                    color: Colors.black,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'View Details',
+                    style: TextStyle(
+                      fontSize: isTablet(context) ? 22 : 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

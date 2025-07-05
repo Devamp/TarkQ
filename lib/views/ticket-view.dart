@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
-import 'package:intl/intl.dart';
 import 'package:tark_q/components/nav-bar.dart';
 import 'package:tark_q/globals.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
@@ -78,6 +76,17 @@ class TicketView extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildTicketStatus(ticketData['createdAt'], "1"),
+                SizedBox(width: 3),
+                Text(
+                  getFormattedDate(ticketData['createdAt']),
+                  style: TextStyle(color: Colors.grey, fontSize: 15),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -123,18 +132,39 @@ class TicketView extends StatelessWidget {
                               .toList(),
                     ),
                 SizedBox(height: 10),
-                Text(
-                  'General',
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: isTablet(context) ? 40 : 24,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withAlpha(75),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'General',
+                      style: TextStyle(
+                        color: Colors.lightGreenAccent,
+                        fontSize: isTablet(context) ? 40 : 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 formField(
-                  Icons.contrast,
-                  'Faction',
-                  ticketData['pmcFaction'],
+                  Icons.sports_kabaddi,
+                  'Mode',
+                  ticketData['gameMode'] ?? "PVP",
+                  context,
+                ),
+                formField(
+                  Icons.hourglass_bottom_rounded,
+                  'In-Game Hours',
+                  '${ticketData['userHours'] ?? '< 50'} hours',
                   context,
                 ),
                 formField(
@@ -144,18 +174,45 @@ class TicketView extends StatelessWidget {
                   context,
                 ),
                 formField(
+                  Icons.star,
+                  'Skill Rating',
+                  ticketData['skillRating'] ?? "New",
+                  context,
+                ),
+                formField(
+                  Icons.contrast,
+                  'Faction',
+                  ticketData['pmcFaction'],
+                  context,
+                ),
+                formField(
                   Icons.date_range,
                   'Created',
                   getFormattedDate(ticketData['createdAt']),
                   context,
                 ),
                 SizedBox(height: 10),
-                Text(
-                  'Raid Info',
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: isTablet(context) ? 40 : 24,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withAlpha(75),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Raid Info',
+                      style: TextStyle(
+                        color: Colors.lightGreenAccent,
+                        fontSize: isTablet(context) ? 40 : 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 formField(
@@ -172,12 +229,27 @@ class TicketView extends StatelessWidget {
                   context,
                 ),
                 SizedBox(height: 10),
-                Text(
-                  'Contact Info',
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: isTablet(context) ? 40 : 24,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withAlpha(75),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Contact Info',
+                      style: TextStyle(
+                        color: Colors.lightGreenAccent,
+                        fontSize: isTablet(context) ? 40 : 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 formField(
@@ -256,6 +328,7 @@ class TicketView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text('Ticket View'),
         backgroundColor: Colors.black,
@@ -263,10 +336,9 @@ class TicketView extends StatelessWidget {
           fontWeight: FontWeight.bold,
           fontSize: isTablet(context) ? 32 : 20,
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.white, size: 20),
       ),
-      body: Container(
-        color: Colors.black,
+      body: SingleChildScrollView(
         child: Column(
           children: [
             buildTicketHeader(context),
