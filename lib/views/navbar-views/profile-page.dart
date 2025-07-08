@@ -103,6 +103,7 @@ class _ProfileState extends State<Profile> {
                     )
                     : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children:
                           userAchievements
                               .where((achievement) => achievement != "None")

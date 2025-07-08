@@ -41,6 +41,20 @@ class UserServices {
     }
   }
 
+  Future<void> reauthenticateAndDelete(String email, String password) async {
+    final user = currentUser;
+
+    final cred = EmailAuthProvider.credential(email: email, password: password);
+
+    try {
+      await user?.reauthenticateWithCredential(cred);
+      await user?.delete();
+      await dataAccess.delete(email);
+    } on FirebaseAuthException catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> deleteUserAccount() async {
     try {
       _auth.currentUser?.delete();

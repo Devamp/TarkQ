@@ -110,6 +110,7 @@ class TicketView extends StatelessWidget {
                 userAchievements.whereType<String>().isEmpty
                     ? SizedBox()
                     : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children:
                           userAchievements

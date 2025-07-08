@@ -22,15 +22,20 @@ class DataAccess {
   }
 
   Future<void> delete(String userEmail) async {
+    final firestore = FirebaseFirestore.instance;
+
     try {
-      await FirebaseFirestore.instance
-          .collection('RaidTickets')
-          .doc(userEmail)
-          .delete();
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(userEmail)
-          .delete();
+      final ticketsQuery =
+          await firestore
+              .collection('RaidTickets')
+              .where('userEmail', isEqualTo: userEmail)
+              .get();
+
+      for (final doc in ticketsQuery.docs) {
+        await doc.reference.delete();
+      }
+
+      await firestore.collection('Users').doc(userEmail).delete();
     } catch (e) {
       rethrow;
     }

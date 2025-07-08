@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tark_q/views/filter-page.dart';
 import 'package:tark_q/views/login-page.dart';
+import 'package:tark_q/views/menu-page.dart';
 import 'package:tark_q/views/navbar-views/home-page.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
 import 'package:tark_q/views/raid-form.dart';
@@ -31,54 +32,6 @@ class _NavBarState extends State<NavBar> {
 
   void _onItemTapped(int index) => setState(() => _selectedIndex = index);
 
-  TextStyle _titleStyle(BuildContext context) => TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: isTablet(context) ? 28 : 22,
-  );
-
-  TextStyle _dialogTextStyle(BuildContext context, {Color? color}) => TextStyle(
-    fontSize: isTablet(context) ? 22 : 16,
-    color: color ?? Colors.black,
-    fontWeight: FontWeight.bold,
-  );
-
-  void _showLogoutDialog() {
-    showCupertinoDialog(
-      context: context,
-      builder:
-          (_) => CupertinoAlertDialog(
-            title: Text('Are you sure?', style: _dialogTextStyle(context)),
-            content: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                'You will be logged out.',
-                style: TextStyle(fontSize: isTablet(context) ? 20 : 14),
-              ),
-            ),
-            actions: [
-              CupertinoDialogAction(
-                isDestructiveAction: true,
-                child: Text('Yes', style: _dialogTextStyle(context)),
-                onPressed: () {
-                  userServices.signOutUser();
-                  Navigator.of(context).pushReplacement(
-                    CupertinoPageRoute(builder: (_) => Login()),
-                  );
-                },
-              ),
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                child: Text(
-                  'No',
-                  style: _dialogTextStyle(context, color: Colors.redAccent),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool isOnHome = _selectedIndex == 0;
@@ -93,6 +46,16 @@ class _NavBarState extends State<NavBar> {
     };
 
     final List<Widget> pages = [Home(filters), Profile()];
+
+    TextStyle _titleStyle(BuildContext context) =>
+        TextStyle(fontWeight: FontWeight.bold, fontSize: 22);
+
+    TextStyle _dialogTextStyle(BuildContext context, {Color? color}) =>
+        TextStyle(
+          fontSize: 16,
+          color: color ?? Colors.black,
+          fontWeight: FontWeight.bold,
+        );
 
     return PopScope(
       canPop: false,
@@ -143,9 +106,13 @@ class _NavBarState extends State<NavBar> {
               ),
             if (!isOnHome)
               IconButton(
-                icon: Icon(Icons.logout, size: isTablet(context) ? 36 : 24),
-                color: Colors.redAccent,
-                onPressed: _showLogoutDialog,
+                icon: Icon(Icons.menu, size: 25),
+                color: Colors.white,
+                onPressed:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => MenuPage()),
+                    ),
               ),
           ],
           bottom: PreferredSize(
