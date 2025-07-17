@@ -57,22 +57,28 @@ class WelcomeIntro extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             child: Column(
               children: [
-                Text(
-                  'Welcome',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: isTablet(context) ? 48 : 38,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Welcome',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.waving_hand_rounded,
+                      color: Colors.lightGreenAccent,
+                      size: 30,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                const Icon(
-                  Icons.waving_hand_rounded,
-                  color: Colors.lightGreenAccent,
-                  size: 42,
-                ),
-                const SizedBox(height: 16),
+
+                const SizedBox(height: 5),
                 const Divider(
                   color: Colors.grey,
                   thickness: 2.0,

@@ -2,9 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tark_q/views/filter-page.dart';
-import 'package:tark_q/views/login-page.dart';
 import 'package:tark_q/views/menu-page.dart';
-import 'package:tark_q/views/navbar-views/home-page.dart';
+import 'package:tark_q/views/navbar-views/lfr-page.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
 import 'package:tark_q/views/raid-form.dart';
 import '../globals.dart';
@@ -45,7 +44,7 @@ class _NavBarState extends State<NavBar> {
       'skillRating': 'Any',
     };
 
-    final List<Widget> pages = [Home(filters), Profile()];
+    final List<Widget> pages = [LFR(filters), Profile()];
 
     TextStyle _titleStyle(BuildContext context) =>
         TextStyle(fontWeight: FontWeight.bold, fontSize: 22);
@@ -104,7 +103,7 @@ class _NavBarState extends State<NavBar> {
                       MaterialPageRoute(builder: (_) => RaidForm()),
                     ),
               ),
-            if (!isOnHome)
+            if (_selectedIndex == 1)
               IconButton(
                 icon: Icon(Icons.menu, size: 25),
                 color: Colors.white,
@@ -124,24 +123,31 @@ class _NavBarState extends State<NavBar> {
           ),
         ),
         body: pages[_selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          selectedItemColor: Colors.lightGreenAccent,
-          unselectedItemColor: Colors.grey,
-          selectedLabelStyle: _dialogTextStyle(context),
-          unselectedLabelStyle: _dialogTextStyle(context),
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.public, size: isTablet(context) ? 28 : 22),
-              label: 'LFR',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person, size: isTablet(context) ? 28 : 22),
-              label: 'Profile',
-            ),
-          ],
+        bottomNavigationBar: Theme(
+          data: Theme.of(context).copyWith(
+            splashFactory: NoSplash.splashFactory,
+            highlightColor: Colors.transparent,
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.transparent,
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            selectedItemColor: Colors.lightGreenAccent,
+            unselectedItemColor: Colors.grey,
+            selectedLabelStyle: _dialogTextStyle(context),
+            unselectedLabelStyle: _dialogTextStyle(context),
+            enableFeedback: false,
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.public, size: 22),
+                label: 'LFR',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person, size: 22),
+                label: 'Profile',
+              ),
+            ],
+          ),
         ),
       ),
     );

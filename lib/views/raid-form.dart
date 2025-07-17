@@ -510,7 +510,7 @@ class _RaidFormState extends State<RaidForm> {
                     cursorColor: Colors.white,
                     controller: _contactIdController,
                     keyboardType: TextInputType.text,
-                    maxLength: 13,
+                    maxLength: 15,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(RegExp(r'\s')),
                       LengthLimitingTextInputFormatter(20),

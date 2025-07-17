@@ -68,8 +68,7 @@ class DataAccess {
       final snapshot =
           await FirebaseFirestore.instance
               .collection('RaidTickets')
-              .where('userEmail', isNotEqualTo: userEmail)
-              .orderBy('userEmail') // Required when using isNotEqualTo
+              .orderBy('userEmail')
               .orderBy('timestamp', descending: true)
               .get();
 

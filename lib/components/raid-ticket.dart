@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:tark_q/views/navbar-views/profile-page.dart';
 import 'package:tark_q/views/ticket-view.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import '../globals.dart';
@@ -65,14 +66,19 @@ class _RaidTicketState extends State<RaidTicket> {
     final data = widget.data;
     final isDiscord = data['contactMethod'] == "Discord";
     final contactIcon = isDiscord ? Icons.discord : Icons.contacts;
+    final isUserSelf = data['userEmail'] == userServices.getUserEmail();
 
     return Container(
       padding: EdgeInsets.all(isTablet(context) ? 10 : 10),
       decoration: BoxDecoration(
         color: Colors.black.withAlpha(25),
         border: Border(
-          top: BorderSide(color: Colors.grey.withAlpha(75)),
-          bottom: BorderSide(color: Colors.grey.withAlpha(75)),
+          top: BorderSide(
+            color: isUserSelf ? Colors.amberAccent : Colors.grey.withAlpha(75),
+          ),
+          bottom: BorderSide(
+            color: isUserSelf ? Colors.amberAccent : Colors.grey.withAlpha(75),
+          ),
         ),
       ),
       child: Column(
@@ -89,7 +95,8 @@ class _RaidTicketState extends State<RaidTicket> {
               Text(
                 data['username'],
                 style: TextStyle(
-                  color: Colors.lightGreenAccent,
+                  color:
+                      isUserSelf ? Colors.amberAccent : Colors.lightGreenAccent,
                   fontSize: isTablet(context) ? 30 : 16,
                   fontWeight: FontWeight.bold,
                 ),

@@ -162,50 +162,59 @@ class AccountSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     String username = userServices.getUsername();
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
         backgroundColor: Colors.black,
-        title: Text('Account Settings'),
-        titleTextStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 22),
-        leading: IconButton(
-          icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Text('Account Settings'),
+          titleTextStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 22),
+          leading: IconButton(
+            icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(isTablet(context) ? 20 : 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ProfilePicture(
-              name: username.toUpperCase(),
-              radius: isTablet(context) ? 70 : 40,
-              fontsize: isTablet(context) ? 44 : 30,
-            ),
-            SizedBox(height: 12),
-            Text(
-              username,
-              style: TextStyle(
-                fontSize: isTablet(context) ? 28 : 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+        body: Padding(
+          padding: EdgeInsets.all(isTablet(context) ? 20 : 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ProfilePicture(
+                name: username.toUpperCase(),
+                radius: isTablet(context) ? 70 : 40,
+                fontsize: isTablet(context) ? 44 : 30,
               ),
-            ),
-            SizedBox(height: 30),
-            Divider(color: Colors.white24),
-            ListTile(
-              leading: Icon(Icons.delete_outline, color: Colors.redAccent),
-              title: Text(
-                "Delete Account",
-                style: TextStyle(color: Colors.white),
+              SizedBox(height: 12),
+              Text(
+                username,
+                style: TextStyle(
+                  fontSize: isTablet(context) ? 28 : 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-              onTap: () => _showDeleteConfirmation(context),
-            ),
-            Divider(color: Colors.white24),
-          ],
+              SizedBox(height: 30),
+              Divider(color: Colors.white24),
+              ListTile(
+                leading: Icon(Icons.delete_outline, color: Colors.redAccent),
+                title: Text(
+                  "Delete Account",
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () => _showDeleteConfirmation(context),
+              ),
+              Divider(color: Colors.white24),
+              SizedBox(height: 30),
+              Text(
+                'Version 1.0.0',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            ],
+          ),
         ),
       ),
     );

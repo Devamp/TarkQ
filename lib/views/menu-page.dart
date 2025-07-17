@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'login-page.dart';
 import 'menu-routes/account-settings.dart';
-import 'menu-routes/release-notes-settings.dart';
 import 'navbar-views/profile-page.dart';
 
 class MenuPage extends StatelessWidget {
@@ -146,28 +145,15 @@ class MenuPage extends StatelessWidget {
               context,
               Icons.account_box,
               'Account',
-              'Manage your account settings, password, and account deletion',
+              'Manage your account settings and account deletion',
               const AccountSettings(),
-            ),
-            buildSettingModule(
-              context,
-              Icons.info_outline_rounded,
-              'Release Notes',
-              'View latest release notes on TarkQ',
-              const ReleaseNotes(),
             ),
             buildSettingModule(
               context,
               Icons.logout,
               'Logout',
               'Log out from your account',
-              const ReleaseNotes(),
-            ),
-            SizedBox(height: 30),
-            Text(
-              'Version 1.0.0',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              const AccountSettings(),
             ),
           ],
         ),
