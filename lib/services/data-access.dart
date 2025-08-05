@@ -68,7 +68,6 @@ class DataAccess {
       final snapshot =
           await FirebaseFirestore.instance
               .collection('RaidTickets')
-              .orderBy('userEmail')
               .orderBy('timestamp', descending: true)
               .get();
 
@@ -106,6 +105,11 @@ class DataAccess {
         if (filters.containsKey('contactMethod') &&
             filters['contactMethod'] != 'Any') {
           if (ticket['contactMethod'] != filters['contactMethod']) return false;
+        }
+
+        // Filter by region
+        if (filters.containsKey('region') && filters['region'] != 'Any') {
+          if (ticket['region'] != filters['region']) return false;
         }
 
         // Filter by PMC level (minimum)
@@ -241,5 +245,14 @@ class DataAccess {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<int?> getTotalActiveTickets() async {
+    final ticketsCollection = FirebaseFirestore.instance.collection(
+      'RaidTickets',
+    );
+    final snapshot = await ticketsCollection.count().get();
+
+    return snapshot.count;
   }
 }

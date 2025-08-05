@@ -25,6 +25,7 @@ class _RaidFormState extends State<RaidForm> {
   String gameModeValue = 'PVP';
   String userHoursValue = '100+';
   String skillRatingValue = 'New';
+  String regionValue = 'North America';
 
   bool isLoading = false;
   final _contactIdController = TextEditingController();
@@ -88,6 +89,15 @@ class _RaidFormState extends State<RaidForm> {
     'Tarkov Username',
   ];
 
+  static const List<String> regionOptions = <String>[
+    'North America',
+    'Europe',
+    'Latin America',
+    'Asia',
+    'Australia',
+    'Other',
+  ];
+
   static final List<String> pmcLevelOptions = List.generate(
     79,
     (index) => (index + 1).toString(),
@@ -115,6 +125,8 @@ class _RaidFormState extends State<RaidForm> {
         return userHoursValue;
       case "Skill Rating":
         return skillRatingValue;
+      case "Region":
+        return regionValue;
       default:
         return '';
     }
@@ -148,6 +160,8 @@ class _RaidFormState extends State<RaidForm> {
         break;
       case "Skill Rating":
         skillRatingValue = value;
+      case "Region":
+        regionValue = value;
         break;
     }
   }
@@ -172,6 +186,8 @@ class _RaidFormState extends State<RaidForm> {
         return userHoursOptions;
       case "Skill Rating":
         return skillRatingOptions;
+      case "Region":
+        return regionOptions;
       default:
         return [];
     }
@@ -364,341 +380,367 @@ class _RaidFormState extends State<RaidForm> {
         formField(Icons.location_on_outlined, 'Map', 'Shoreline', 'Raid'),
         formField(Icons.flag, 'Goal', 'Questing', 'Raid'),
         formField(Icons.diversity_3_rounded, 'Max Party Size', '3', 'Raid'),
+        formField(Icons.public, 'Region', 'North America', 'Raid'),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              color: Colors.red,
-              icon: const Icon(Icons.cancel_outlined, size: 30),
-              onPressed: () async {
-                Navigator.of(context).pop(context);
-              },
-            ),
-          ],
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.black,
+    return PopScope(
+      canPop: false,
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black, Color(0xFF1A1A1A)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
         ),
-        backgroundColor: Colors.black,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Raid Ticket',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet(context) ? 40 : 35,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-                Text(
-                  'Create and submit a raid ticket with your raid preference.',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: isTablet(context) ? 20 : 14,
-                    decoration: TextDecoration.none,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withAlpha(75),
-                          width: 1.0,
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      'General Details',
-                      style: TextStyle(
-                        color: Colors.lightGreenAccent,
-                        fontSize: isTablet(context) ? 40 : 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                generalInfo(),
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withAlpha(75),
-                          width: 1.0,
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      'Raid Details',
-                      style: TextStyle(
-                        color: Colors.lightGreenAccent,
-                        fontSize: isTablet(context) ? 40 : 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                raidInfo(),
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withAlpha(75),
-                          width: 1.0,
-                        ),
-                      ),
-                    ),
-
-                    child: Text(
-                      'Contact Details',
-                      style: TextStyle(
-                        color: Colors.lightGreenAccent,
-                        fontSize: isTablet(context) ? 40 : 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                formField(Icons.contacts, 'Contact Method', 'Discord', 'Raid'),
-                Row(
+        child: SafeArea(
+          child: Scaffold(
+            extendBody: true,
+            backgroundColor: Colors.transparent,
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.person_add,
-                      color: Colors.redAccent,
-                      size: isTablet(context) ? 24 : 12,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.receipt_sharp,
+                          color: Colors.lightGreenAccent,
+                          size: 35,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          'Raid Ticket',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.lightGreenAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 32,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                        Spacer(),
+                        IconButton(
+                          color: Colors.redAccent,
+                          icon: const Icon(Icons.cancel_outlined, size: 26),
+                          onPressed: () async {
+                            Navigator.of(context).pop(context);
+                          },
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5),
                     Text(
-                      'Discord or Tarkov Id:',
+                      'Share your raid preferences and match up with PMCs looking for the same experience',
+                      textAlign: TextAlign.start,
                       style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: isTablet(context) ? 20 : 14,
+                        decoration: TextDecoration.none,
                         fontWeight: FontWeight.normal,
-                        fontSize: isTablet(context) ? 20 : 12,
-                        color: Colors.redAccent,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.white.withAlpha(75),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'General Details',
+                          style: TextStyle(
+                            color: Colors.lightGreenAccent,
+                            fontSize: isTablet(context) ? 40 : 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    generalInfo(),
+                    Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.white.withAlpha(75),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'Raid Details',
+                          style: TextStyle(
+                            color: Colors.lightGreenAccent,
+                            fontSize: isTablet(context) ? 40 : 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    raidInfo(),
+                    Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.white.withAlpha(75),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+
+                        child: Text(
+                          'Contact Details',
+                          style: TextStyle(
+                            color: Colors.lightGreenAccent,
+                            fontSize: isTablet(context) ? 40 : 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    formField(
+                      Icons.contacts,
+                      'Contact Method',
+                      'Discord',
+                      'Raid',
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person_add,
+                          color: Colors.redAccent,
+                          size: isTablet(context) ? 24 : 12,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          'Discord or Tarkov Id:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: isTablet(context) ? 20 : 12,
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        cursorColor: Colors.white,
+                        controller: _contactIdController,
+                        keyboardType: TextInputType.text,
+                        maxLength: 15,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                          LengthLimitingTextInputFormatter(20),
+                        ],
+                        style: const TextStyle(color: Colors.lightGreenAccent),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.black,
+                          hintText: "Enter your discord or tarkov username...",
+                          hintStyle: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                            borderSide: const BorderSide(
+                              color: Colors.redAccent,
+                              width: 1.0,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 2.0,
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your Discord or Tarkov username';
+                          }
+                          if (value.contains(' ')) {
+                            return 'Spaces are not allowed';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    Divider(height: 20, color: Colors.white),
+                    Center(
+                      child: Text(
+                        'Please verify your discord or tarkov username again before submitting.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: isTablet(context) ? 20 : 14,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            setState(() {
+                              isLoading = true;
+                            });
+
+                            if (userServices.getNumRaidTickets() < 3) {
+                              // Create the ticket
+                              Map<String, dynamic> ticketData = {
+                                'username': userServices.getUsername(),
+                                'gameMode': gameModeValue,
+                                'userHours': userHoursValue,
+                                'skillRating': skillRatingValue,
+                                'pmcFaction': pmcFactionValue,
+                                'pmcLevel': pmcLevelValue,
+                                'map': mapValue,
+                                'goal': goalValue,
+                                'maxPartySize': partySizeValue,
+                                'contactMethod': contactMethodValue,
+                                'contactId': _contactIdController.text,
+                                'region': regionValue,
+                                'createdAt': Timestamp.now(),
+                              };
+
+                              await dataAccess.createRaidTicket(
+                                ticketData,
+                                userServices.getUserEmail(),
+                              );
+
+                              if (mounted) {
+                                Navigator.pop(context);
+                              }
+                            } else {
+                              setState(() {
+                                isLoading = false;
+                              });
+
+                              if (mounted) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Limit reached'),
+                                      titleTextStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 22,
+                                      ),
+                                      content: Text(
+                                        'You cannot have more than 3 active tickets at a time. Please delete an existing ticket.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: Text(
+                                            'Ok',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightGreenAccent,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child: IntrinsicWidth(
+                          child:
+                              isLoading
+                                  ? Row(
+                                    children: [
+                                      LoadingAnimationWidget.inkDrop(
+                                        color: Colors.black,
+                                        size: 22,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        'Processing...',
+                                        style: TextStyle(
+                                          fontSize: isTablet(context) ? 24 : 18,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                  : Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check,
+                                        color: Colors.black,
+                                        size: isTablet(context) ? 28 : 22,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        'Submit Ticket',
+                                        style: TextStyle(
+                                          fontSize: isTablet(context) ? 24 : 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 5),
-                Form(
-                  key: _formKey,
-                  child: TextFormField(
-                    cursorColor: Colors.white,
-                    controller: _contactIdController,
-                    keyboardType: TextInputType.text,
-                    maxLength: 15,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                      LengthLimitingTextInputFormatter(20),
-                    ],
-                    style: const TextStyle(color: Colors.lightGreenAccent),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.black,
-                      hintText: "Enter your discord or tarkov username...",
-                      hintStyle: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: const BorderSide(
-                          color: Colors.redAccent,
-                          width: 1.0,
-                        ),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: const BorderSide(
-                          color: Colors.red,
-                          width: 1.0,
-                        ),
-                      ),
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                        borderSide: const BorderSide(
-                          color: Colors.red,
-                          width: 2.0,
-                        ),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your Discord or Tarkov username';
-                      }
-                      if (value.contains(' ')) {
-                        return 'Spaces are not allowed';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Divider(height: 20, color: Colors.white),
-                Center(
-                  child: Text(
-                    'Please verify your discord or tarkov username again before submitting.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: isTablet(context) ? 20 : 14,
-                      decoration: TextDecoration.none,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          isLoading = true;
-                        });
-
-                        if (userServices.getNumRaidTickets() < 3) {
-                          // Create the ticket
-                          Map<String, dynamic> ticketData = {
-                            'username': userServices.getUsername(),
-                            'gameMode': gameModeValue,
-                            'userHours': userHoursValue,
-                            'skillRating': skillRatingValue,
-                            'pmcFaction': pmcFactionValue,
-                            'pmcLevel': pmcLevelValue,
-                            'map': mapValue,
-                            'goal': goalValue,
-                            'maxPartySize': partySizeValue,
-                            'contactMethod': contactMethodValue,
-                            'contactId': _contactIdController.text,
-                            'createdAt': Timestamp.now(),
-                          };
-
-                          await dataAccess.createRaidTicket(
-                            ticketData,
-                            userServices.getUserEmail(),
-                          );
-
-                          if (mounted) {
-                            Navigator.pop(context);
-                          }
-                        } else {
-                          setState(() {
-                            isLoading = false;
-                          });
-
-                          if (mounted) {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Limit reached'),
-                                  titleTextStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 22,
-                                  ),
-                                  content: Text(
-                                    'You cannot have more than 3 active tickets at a time. Please delete an existing ticket.',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      child: Text(
-                                        'Ok',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightGreenAccent,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                    child: IntrinsicWidth(
-                      child:
-                          isLoading
-                              ? Row(
-                                children: [
-                                  LoadingAnimationWidget.inkDrop(
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Processing...',
-                                    style: TextStyle(
-                                      fontSize: isTablet(context) ? 24 : 18,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              )
-                              : Row(
-                                children: [
-                                  Icon(
-                                    Icons.check,
-                                    color: Colors.black,
-                                    size: isTablet(context) ? 28 : 22,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Submit Ticket',
-                                    style: TextStyle(
-                                      fontSize: isTablet(context) ? 24 : 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:tark_q/views/navbar-views/profile-page.dart';
 import 'package:tark_q/views/ticket-view.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import '../globals.dart';
+import 'nav-bar.dart';
 
 class RaidTicket extends StatefulWidget {
   const RaidTicket({super.key, required this.data});
@@ -72,14 +73,7 @@ class _RaidTicketState extends State<RaidTicket> {
       padding: EdgeInsets.all(isTablet(context) ? 10 : 10),
       decoration: BoxDecoration(
         color: Colors.black.withAlpha(25),
-        border: Border(
-          top: BorderSide(
-            color: isUserSelf ? Colors.amberAccent : Colors.grey.withAlpha(75),
-          ),
-          bottom: BorderSide(
-            color: isUserSelf ? Colors.amberAccent : Colors.grey.withAlpha(75),
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.withAlpha(75))),
       ),
       child: Column(
         children: [
@@ -88,21 +82,18 @@ class _RaidTicketState extends State<RaidTicket> {
             children: [
               ProfilePicture(
                 name: data['username'][0].toUpperCase(),
-                radius: isTablet(context) ? 28 : 20,
-                fontsize: isTablet(context) ? 26 : 16,
+                radius: 20,
+                fontsize: 16,
               ),
               const SizedBox(width: 8),
               Text(
                 data['username'],
                 style: TextStyle(
-                  color:
-                      isUserSelf ? Colors.amberAccent : Colors.lightGreenAccent,
+                  color: isUserSelf ? Colors.redAccent : Colors.amberAccent,
                   fontSize: isTablet(context) ? 30 : 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(width: 3),
-              buildTicketStatus(data['createdAt'], "2"),
               const Spacer(),
               Column(
                 children: [
@@ -111,7 +102,7 @@ class _RaidTicketState extends State<RaidTicket> {
                     data['gameMode'] ?? 'PVP',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.lightGreenAccent,
+                      color: Colors.amberAccent,
                     ),
                   ),
                 ],
@@ -146,6 +137,11 @@ class _RaidTicketState extends State<RaidTicket> {
                       buildInfoRow(contactIcon, data['contactMethod']),
                     ],
                   ),
+                  Row(
+                    children: [
+                      buildInfoRow(Icons.public, data['region'] ?? 'Other'),
+                    ],
+                  ),
                 ],
               ),
             ],
@@ -154,38 +150,85 @@ class _RaidTicketState extends State<RaidTicket> {
           const SizedBox(height: 12),
 
           // Button
-          SizedBox(
-            width: isTablet(context) ? 250 : 160,
-            height: 38,
-            child: ElevatedButton(
-              onPressed: navigateToTicketView,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightGreenAccent,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: navigateToTicketView,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  minimumSize: Size.zero,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.remove_red_eye_sharp,
+                        size: isTablet(context) ? 22 : 15,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        'View Details',
+                        style: TextStyle(
+                          fontSize: isTablet(context) ? 22 : 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.remove_red_eye_sharp,
-                    size: isTablet(context) ? 22 : 15,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    'View Details',
-                    style: TextStyle(
-                      fontSize: isTablet(context) ? 22 : 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+              SizedBox(width: 8),
+              userServices.userData?['username'] == data['username']
+                  ? Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final navigator = Navigator.of(context);
+
+                        await userServices.deleteUserTicket(
+                          userServices.getUserEmail(),
+                          data['id'],
+                        );
+                        navigator.pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        minimumSize: Size.zero,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Icon(
+                          Icons.delete_forever,
+                          size: 22,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                  )
+                  : SizedBox(),
+            ],
           ),
         ],
       ),

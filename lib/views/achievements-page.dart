@@ -200,236 +200,232 @@ class _AchievementsPageState extends State<AchievementsPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Achievements'),
-          backgroundColor: Colors.black,
-          titleTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet(context) ? 32 : 20,
-          ),
-          leading: IconButton(
-            icon: Icon(Icons.chevron_left, color: Colors.white, size: 30),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black, Color(0xFF1A1A1A)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
-        backgroundColor: Colors.black,
-        body: Column(
-          children: [
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.emoji_events,
-                  color: Colors.lightGreenAccent,
-                  size: 30,
-                ),
-                SizedBox(width: 5),
-                Text(
-                  'Show Off Achievements',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: isTablet(context) ? 28 : 20,
-                    fontWeight: FontWeight.bold,
+        child: SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.emoji_events,
+                        color: Colors.lightGreenAccent,
+                        size: 35,
+                      ),
+                      SizedBox(width: 3),
+                      Text(
+                        'Achievements',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.lightGreenAccent,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        color: Colors.redAccent,
+                        icon: const Icon(Icons.cancel_outlined, size: 26),
+                        onPressed: () async {
+                          Navigator.of(context).pop(context);
+                        },
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(width: 5),
-                Icon(
-                  Icons.emoji_events,
-                  color: Colors.lightGreenAccent,
-                  size: 30,
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text(
-                'You may select up to 4 achievements to display on your account profile.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: isTablet(context) ? 28 : 14,
-                ),
-              ),
-            ),
-            Column(
-              children: List.generate(
-                4,
-                (index) => achievementContainer(index),
-              ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed:
-                      (selectedAchievements == null ||
-                              isLoadingClear ||
-                              selectedAchievements!.every(
-                                (item) => item == "None",
-                              ))
-                          ? () {}
-                          : () async {
-                            setState(() {
-                              isLoadingClear = true;
-                              buttonTextClear = 'Clearing...';
-                            });
-                            await userServices.updateUserAchievements(
-                              userServices.getUserEmail(),
-                              [],
-                            );
-                            setState(() {
-                              isLoadingClear = false;
-                              buttonTextClear = 'Cleared';
-                              _loadInitialAchievements();
-                            });
-                            await Future.delayed(Duration(seconds: 2));
-                            if (mounted) {
-                              setState(() {
-                                buttonTextClear = 'Clear';
-                              });
-                            }
-                          },
+                  Text(
+                    'You may select up to 4 achievements to display on your account profile.',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                  SizedBox(height: 20),
+                  Column(
+                    children: List.generate(
+                      4,
+                      (index) => achievementContainer(index),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed:
+                            (selectedAchievements == null ||
+                                    isLoadingClear ||
+                                    selectedAchievements!.every(
+                                      (item) => item == "None",
+                                    ))
+                                ? () {}
+                                : () async {
+                                  setState(() {
+                                    isLoadingClear = true;
+                                    buttonTextClear = 'Clearing...';
+                                  });
+                                  await userServices.updateUserAchievements(
+                                    userServices.getUserEmail(),
+                                    [],
+                                  );
+                                  setState(() {
+                                    isLoadingClear = false;
+                                    buttonTextClear = 'Cleared';
+                                    _loadInitialAchievements();
+                                  });
+                                  await Future.delayed(Duration(seconds: 2));
+                                  if (mounted) {
+                                    setState(() {
+                                      buttonTextClear = 'Clear';
+                                    });
+                                  }
+                                },
 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 50,
-                      vertical: 15,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child:
-                      isLoadingClear
-                          ? IntrinsicWidth(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                LoadingAnimationWidget.inkDrop(
-                                  color: Colors.black,
-                                  size: 30,
-                                ),
-                              ],
-                            ),
-                          )
-                          : IntrinsicWidth(
-                            child: Row(
-                              children: [
-                                !isLoadingClear && buttonTextClear == "Cleared"
-                                    ? Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 5.0,
-                                      ),
-                                      child: Icon(
-                                        Icons.check,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 50,
+                            vertical: 15,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child:
+                            isLoadingClear
+                                ? IntrinsicWidth(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      LoadingAnimationWidget.inkDrop(
                                         color: Colors.black,
-                                        size: 24,
+                                        size: 30,
                                       ),
-                                    )
-                                    : SizedBox(),
-                                Text(
-                                  buttonTextClear,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                    ],
+                                  ),
+                                )
+                                : IntrinsicWidth(
+                                  child: Row(
+                                    children: [
+                                      !isLoadingClear &&
+                                              buttonTextClear == "Cleared"
+                                          ? Padding(
+                                            padding: const EdgeInsets.only(
+                                              right: 5.0,
+                                            ),
+                                            child: Icon(
+                                              Icons.check,
+                                              color: Colors.black,
+                                              size: 24,
+                                            ),
+                                          )
+                                          : SizedBox(),
+                                      Text(
+                                        buttonTextClear,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                ),
-                SizedBox(width: 15),
-                ElevatedButton(
-                  onPressed:
-                      (selectedAchievements == null ||
-                              isLoadingSave ||
-                              selectedAchievements!.every(
-                                (item) => item == "None",
-                              ))
-                          ? () {}
-                          : () async {
-                            setState(() {
-                              isLoadingSave = true;
-                              buttonTextSave = 'Saving...';
-                            });
-                            await userServices.updateUserAchievements(
-                              userServices.getUserEmail(),
-                              selectedAchievements!,
-                            );
-                            setState(() {
-                              isLoadingSave = false;
-                              buttonTextSave = 'Saved';
-                            });
-                            await Future.delayed(Duration(seconds: 2));
-                            if (mounted) {
-                              setState(() {
-                                buttonTextSave = 'Save';
-                              });
-                            }
-                          },
+                      ),
+                      SizedBox(width: 15),
+                      ElevatedButton(
+                        onPressed:
+                            (selectedAchievements == null ||
+                                    isLoadingSave ||
+                                    selectedAchievements!.every(
+                                      (item) => item == "None",
+                                    ))
+                                ? () {}
+                                : () async {
+                                  setState(() {
+                                    isLoadingSave = true;
+                                    buttonTextSave = 'Saving...';
+                                  });
+                                  await userServices.updateUserAchievements(
+                                    userServices.getUserEmail(),
+                                    selectedAchievements!,
+                                  );
+                                  setState(() {
+                                    isLoadingSave = false;
+                                    buttonTextSave = 'Saved';
+                                  });
+                                  await Future.delayed(Duration(seconds: 2));
+                                  if (mounted) {
+                                    setState(() {
+                                      buttonTextSave = 'Save';
+                                    });
+                                  }
+                                },
 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreenAccent,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 50,
-                      vertical: 15,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child:
-                      isLoadingSave
-                          ? IntrinsicWidth(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                LoadingAnimationWidget.inkDrop(
-                                  color: Colors.black,
-                                  size: 30,
-                                ),
-                              ],
-                            ),
-                          )
-                          : IntrinsicWidth(
-                            child: Row(
-                              children: [
-                                !isLoadingSave && buttonTextSave == "Saved"
-                                    ? Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 5.0,
-                                      ),
-                                      child: Icon(
-                                        Icons.check,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightGreenAccent,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 50,
+                            vertical: 15,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child:
+                            isLoadingSave
+                                ? IntrinsicWidth(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      LoadingAnimationWidget.inkDrop(
                                         color: Colors.black,
-                                        size: 24,
+                                        size: 30,
                                       ),
-                                    )
-                                    : SizedBox(),
-                                Text(
-                                  buttonTextSave,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                    ],
+                                  ),
+                                )
+                                : IntrinsicWidth(
+                                  child: Row(
+                                    children: [
+                                      !isLoadingSave &&
+                                              buttonTextSave == "Saved"
+                                          ? Padding(
+                                            padding: const EdgeInsets.only(
+                                              right: 5.0,
+                                            ),
+                                            child: Icon(
+                                              Icons.check,
+                                              color: Colors.black,
+                                              size: 24,
+                                            ),
+                                          )
+                                          : SizedBox(),
+                                      Text(
+                                        buttonTextSave,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                ),
-              ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

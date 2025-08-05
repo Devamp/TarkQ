@@ -146,6 +146,7 @@ class UserServices {
 
   Future<void> loadUserOnLogin() async {
     try {
+      print('Loaded User');
       userData = await dataAccess.getUserData(_auth.currentUser!.email);
     } catch (e) {
       rethrow;
@@ -205,5 +206,9 @@ class UserServices {
     }
 
     return [];
+  }
+
+  Future<int?> getTotalActiveTickets() async {
+    return await dataAccess.getTotalActiveTickets();
   }
 }

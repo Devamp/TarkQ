@@ -207,12 +207,6 @@ class AccountSettings extends StatelessWidget {
                 onTap: () => _showDeleteConfirmation(context),
               ),
               Divider(color: Colors.white24),
-              SizedBox(height: 30),
-              Text(
-                'Version 1.0.0',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
             ],
           ),
         ),

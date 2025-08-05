@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tark_q/globals.dart';
 import 'package:tark_q/views/login-page.dart';
 
 class Landing extends StatelessWidget {
@@ -7,134 +6,122 @@ class Landing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.black),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 40),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.crop_rotate_sharp,
-                    color: Colors.lightGreenAccent,
-                    size: isTablet(context) ? 55 : 28,
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    'Maved\nSoftware',
-                    style: TextStyle(
-                      decoration: TextDecoration.none,
-                      color: Colors.lightGreenAccent,
-                      fontSize: isTablet(context) ? 50 : 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Image.asset('assets/squad.png', fit: BoxFit.cover),
+        ),
+
+        Positioned.fill(
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black12, Colors.black26, Colors.black45],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
-            Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(left: 5.0),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.my_location,
-                    color: Colors.lightGreenAccent,
-                    size: isTablet(context) ? 120 : 70,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    'TarkQ',
-                    style: TextStyle(
-                      decoration: TextDecoration.none,
-                      color: Colors.lightGreenAccent,
-                      fontSize: isTablet(context) ? 150 : 70,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Solo raids end here.',
-                      style: TextStyle(
-                        decoration: TextDecoration.none,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet(context) ? 55 : 28,
-                        color: Colors.white,
-                      ),
-                    ),
-                    TextSpan(
-                      text:
-                          ' Connect with skilled sherpas or find fellow PMCs for your next Tarkov mission.',
-                      style: TextStyle(
-                        decoration: TextDecoration.none,
-                        fontWeight: FontWeight.normal,
-                        fontSize: isTablet(context) ? 50 : 24,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 18),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: ElevatedButton(
-                onPressed:
-                    () => {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      ),
-                    },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreenAccent,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 35,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-                child: IntrinsicWidth(
-                  child: Row(
+          ),
+        ),
+
+        // Foreground Content
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(height: 15),
+                Expanded(
+                  child: Column(
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'TarkQ',
+                            style: TextStyle(
+                              fontSize: 95,
+                              color: Colors.lightGreenAccent,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                        ],
+                      ),
                       Text(
-                        'DEPLOY',
+                        'Squad Up. Raid. Repeat.',
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: isTablet(context) ? 40 : 22,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
                           decoration: TextDecoration.none,
                         ),
                       ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: Colors.black,
-                        size: 30.0,
+                      Spacer(),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const Login(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightGreenAccent,
+                          foregroundColor: Colors.black,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 25,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Find My Squad',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, size: 30),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.copyright,
+                      color: Colors.lightGreenAccent,
+                      size: 25,
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      'Maved Software',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.lightGreenAccent,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

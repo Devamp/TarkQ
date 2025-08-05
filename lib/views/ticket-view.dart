@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
-import 'package:tark_q/components/nav-bar.dart';
 import 'package:tark_q/globals.dart';
 import 'package:tark_q/views/navbar-views/profile-page.dart';
 import '../components/award-container.dart';
@@ -54,9 +53,9 @@ class TicketView extends StatelessWidget {
 
   Widget buildTicketHeader(BuildContext context) {
     return Container(
-      color: Colors.black,
+      color: Colors.transparent,
       child: Padding(
-        padding: EdgeInsets.all(isTablet(context) ? 20 : 10),
+        padding: EdgeInsets.all(10),
         child: Column(
           children: [
             ProfilePicture(
@@ -80,7 +79,7 @@ class TicketView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 buildTicketStatus(ticketData['createdAt'], "1"),
-                SizedBox(width: 3),
+                SizedBox(width: 5),
                 Text(
                   getFormattedDate(ticketData['createdAt']),
                   style: TextStyle(color: Colors.grey, fontSize: 15),
@@ -100,9 +99,14 @@ class TicketView extends StatelessWidget {
         final userAchievements = snapshot.data ?? [];
 
         return Container(
-          color: Colors.black,
+          color: Colors.transparent,
           child: Padding(
-            padding: EdgeInsets.all(10.0),
+            padding: const EdgeInsets.only(
+              left: 10,
+              right: 10,
+              top: 5,
+              bottom: 30,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -138,7 +142,7 @@ class TicketView extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.transparent,
                       border: Border(
                         bottom: BorderSide(
                           color: Colors.white.withAlpha(75),
@@ -198,7 +202,7 @@ class TicketView extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.transparent,
                       border: Border(
                         bottom: BorderSide(
                           color: Colors.white.withAlpha(75),
@@ -229,13 +233,19 @@ class TicketView extends StatelessWidget {
                   ticketData['maxPartySize'],
                   context,
                 ),
+                formField(
+                  Icons.public,
+                  'Region',
+                  ticketData['region'] ?? 'Other',
+                  context,
+                ),
                 SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.all(5),
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.transparent,
                       border: Border(
                         bottom: BorderSide(
                           color: Colors.white.withAlpha(75),
@@ -267,57 +277,6 @@ class TicketView extends StatelessWidget {
                   ticketData['contactId'],
                   context,
                 ),
-                SizedBox(height: 30),
-                userServices.userData?['username'] == ticketData['username']
-                    ? Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final navigator = Navigator.of(context);
-
-                          await userServices.deleteUserTicket(
-                            userServices.getUserEmail(),
-                            ticketData['id'],
-                          );
-
-                          navigator.pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) => NavBar(initialIndex: 1),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          foregroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isTablet(context) ? 60 : 30,
-                            vertical: isTablet(context) ? 20 : 10,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
-                        child: IntrinsicWidth(
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.delete_forever,
-                                color: Colors.black,
-                                size: isTablet(context) ? 30 : 25,
-                              ),
-                              SizedBox(width: 5),
-                              Text(
-                                'Delete Ticket',
-                                style: TextStyle(
-                                  fontSize: isTablet(context) ? 30 : 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                    : SizedBox(),
               ],
             ),
           ),
@@ -328,24 +287,34 @@ class TicketView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: Text('Ticket View'),
-        backgroundColor: Colors.black,
-        titleTextStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: isTablet(context) ? 32 : 20,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.black87, Color(0xFF1A1A1A)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        iconTheme: IconThemeData(color: Colors.white, size: 20),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            buildTicketHeader(context),
-            buildTicketDetails(context),
-            SizedBox(height: 10),
-          ],
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text('Ticket View'),
+          backgroundColor: Colors.transparent,
+          titleTextStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: isTablet(context) ? 32 : 20,
+          ),
+          iconTheme: IconThemeData(color: Colors.white, size: 20),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              buildTicketHeader(context),
+              buildTicketDetails(context),
+              SizedBox(height: 10),
+            ],
+          ),
         ),
       ),
     );

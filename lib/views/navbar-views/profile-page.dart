@@ -35,7 +35,7 @@ class _ProfileState extends State<Profile> {
         return Padding(
           padding: EdgeInsets.all(isTablet(context) ? 15 : 10),
           child: Container(
-            color: Colors.black,
+            color: Colors.transparent,
             child: Column(
               children: [
                 ProfilePicture(
@@ -55,7 +55,7 @@ class _ProfileState extends State<Profile> {
                 SizedBox(height: 10),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.transparent,
                     border: Border(
                       bottom: BorderSide(
                         color: Colors.white.withAlpha(75),
@@ -124,29 +124,6 @@ class _ProfileState extends State<Profile> {
                               })
                               .toList(),
                     ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withAlpha(75),
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  width: double.infinity,
-                  child: Padding(
-                    padding: EdgeInsets.all(isTablet(context) ? 20 : 5),
-                    child: Text(
-                      'Active Tickets',
-                      style: TextStyle(
-                        color: Colors.lightGreenAccent,
-                        fontSize: isTablet(context) ? 28 : 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -155,66 +132,22 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Future<List<Map<String, dynamic>>> _loadRaidTickets() async {
-    await userServices.loadUserOnLogin();
-
-    final rawList = await userServices.getUserRaidTickets(
-      userServices.getUserEmail(),
-    );
-
-    // Ensure type safety by casting each item
-    return rawList.map((e) => e).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: FutureBuilder<List<Map<String, dynamic>>>(
-          future: _loadRaidTickets(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-
-            final List<Map<String, dynamic>> allTickets = snapshot.data ?? [];
-
-            return Column(
-              children: [
-                buildProfileHeader(context), // Fixed top header
-                Expanded(
-                  // This makes only the ticket list scrollable
-                  child:
-                      allTickets.isEmpty
-                          ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Text(
-                                "You have no active raid tickets.",
-                                style: TextStyle(
-                                  color: Colors.lightGreenAccent,
-                                  fontSize: isTablet(context) ? 26 : 18,
-                                ),
-                              ),
-                            ),
-                          )
-                          : ListView.builder(
-                            padding: EdgeInsets.zero,
-                            itemCount: allTickets.length,
-                            itemBuilder: (context, index) {
-                              return RaidTicket(data: allTickets[index]);
-                            },
-                          ),
-                ),
-              ],
-            );
-          },
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black, Color(0xFF1A1A1A)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.transparent,
+          body: buildProfileHeader(context),
         ),
       ),
     );

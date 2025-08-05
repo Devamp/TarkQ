@@ -154,14 +154,14 @@ Widget buildTicketStatus(Timestamp ticketCreatedAt, String screen) {
 
   Color iconColor = Colors.grey;
 
-  if (difference.inHours < 2) {
+  if (difference.inHours < 1) {
     iconColor = Colors.green;
-  } else if (difference.inHours < 8) {
+  } else if (difference.inHours < 5) {
     iconColor = Colors.yellow;
   } else if (difference.inHours < 24) {
-    iconColor = Colors.red;
+    iconColor = Colors.orangeAccent;
   } else {
-    iconColor = Colors.grey;
+    iconColor = Colors.redAccent;
   }
 
   return Icon(Icons.circle, color: iconColor, size: screen == "1" ? 18 : 14);
